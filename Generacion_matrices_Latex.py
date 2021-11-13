@@ -31,10 +31,10 @@ for nombre in lista:
         
         texto+=matrix[n:]
         
-        file.write('\\begin{ecuation}\n')
-        file.write('\\begin{bmatrix}\n  R \\\ G \\\ B \n\end{bmatrix}=')
+        file.write('\\begin{equation}\n')
+        file.write('\\begin{bmatrix}\n  R_s \\\ G_s \\\ B_s \n\end{bmatrix}=')
         file.write(texto)
         file.write('\n\\begin{bmatrix}\n  R \\\ G \\\ B \\\ 1 \n\end{bmatrix}\n')
-        file.write('\end{ecuation}\n')
+        file.write('\end{equation}\n')
         
         file.close()

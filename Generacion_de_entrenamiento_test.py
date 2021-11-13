@@ -47,7 +47,7 @@ for grupo in entrenamiento:
     #% Reconstruccion
     
     lista_patron=lista1[15*(grupo-1):15*grupo]
-    imagenes_patron,shape_imag = fun.Read_Multiespectral_imag(carpeta1, lista_patron,filtro_bi='on') 
+    imagenes_patron,shape_imag = fun.Read_Multiespectral_imag(carpeta1, lista_patron) 
     im_RGB= fun.ReproduccionCie1931(imagenes_patron[:-2]/255)
     
     error = fun.Error_de_reproduccion([im_RGB], mascaras, color_check)

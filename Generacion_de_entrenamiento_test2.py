@@ -53,8 +53,11 @@ for grupo in entrenamiento:
     
     lista_patron=lista1[15*(grupo-1):15*grupo]
     imagenes_patron,shape_imag = fun.Read_Multiespectral_imag(carpeta1, lista_patron) 
-    im_RGB= fun.ReproduccionCie1931(imagenes_patron[:-2],selec_imagenes=combinaciones[combinacion_numero])
-   
+    im_RGB= fun.ReproduccionCie19312(imagenes_patron[:-2]/255,selec_imagenes=combinaciones[combinacion_numero])
+    
+    error = fun.Error_de_reproduccion([im_RGB], mascaras, color_check)
+    print('error de reconstruccion imagen '+str(grupo)+':'+str(np.mean(error)))
+    
     fun.imshow('Imagen reconstruida grupo: '+str(grupo), im_RGB)
     lista_RGB = fun.RGB_IN(im_RGB, mascaras)*255
     lista_RGB = np.array(lista_RGB,dtype='uint8')
@@ -75,7 +78,10 @@ for grupo in test:
     
     lista_patron=lista1[15*(grupo-1):15*grupo]
     imagenes_patron,shape_imag = fun.Read_Multiespectral_imag(carpeta1, lista_patron) 
-    im_RGB= fun.ReproduccionCie1931(imagenes_patron[:-2],selec_imagenes=combinaciones[combinacion_numero])
+    im_RGB= fun.ReproduccionCie19312(imagenes_patron[:-2]/255,selec_imagenes=combinaciones[combinacion_numero])
+    
+    error = fun.Error_de_reproduccion([im_RGB], mascaras, color_check)
+    print('error de reconstruccion imagen '+str(grupo)+':'+str(np.mean(error)))
     
     fun.imshow('Imagen reconstruida grupo: '+str(grupo), im_RGB)
     lista_RGB = fun.RGB_IN(im_RGB, mascaras)*255

@@ -26,7 +26,7 @@ def Read_Multiespectral_imag(carpeta, lista,filtro_bi='off'):
     for nombre in sorted(lista):
         imagen=cv2.cvtColor(cv2.imread(carpeta+"/"+nombre), cv2.COLOR_BGR2GRAY)#cargamos imagenes multiespectrales en escala de grises
         if filtro_bi == 'on':
-            imagen = cv2.bilateralFilter(imagen, 5, 30, 30) 
+            imagen = cv2.bilateralFilter(imagen, 15, 60, 60) 
         imagenespatron=np.concatenate((imagenespatron,np.squeeze(np.reshape(imagen,(1,-1)))),axis=0) #se convierte la imagen en una columna y se concatena con las demas del espectro
     shape_imag=np.shape(imagen)
     imagenespatron=imagenespatron.reshape(len(lista),-1)#se redimensiona a  Filas * N imagenes multiespectrales filas de pixeles de las imagenes espectrales
@@ -668,7 +668,7 @@ def ReproduccionCie1931(imagenes_patron,shape_imag=(480,640,3),selec_imagenes='A
 
 #%%
 
-def ReproduccionCie19312(imagenes_patron,shape_imag=(480,640,3),selec_imagenes='All'):
+def ReproduccionCie19312(imagenes_patron,Pesos_ecu,shape_imag=(480,640,3),selec_imagenes='All'):
      
     if (selec_imagenes=='All'):
         selec_imagenes=range(np.shape(imagenes_patron)[0])
@@ -714,13 +714,12 @@ def ReproduccionCie19312(imagenes_patron,shape_imag=(480,640,3),selec_imagenes='
 
     #% Coeficientes
     Coef= (CIE1931[selec_imagenes,1:]*(np.ones((3,1))*D65[selec_imagenes,1].T).T).T
-    
+    N = np.sum(Coef,axis=1)
     #%  Reproduccion de color usando CIE
     
-    xyz = np.dot(Coef,imagenes_patron[selec_imagenes,:]).T
-    N = np.max(xyz,axis=0)
+    xyz = np.dot(Coef,(imagenes_patron[selec_imagenes,:].T*Pesos_ecu).T).T
     #print(N)
-    xyz = xyz/N
+    xyz = xyz/N[1]
     
     rgb = recorte(np.dot(XYZ2RGB,xyz.T).T)
     

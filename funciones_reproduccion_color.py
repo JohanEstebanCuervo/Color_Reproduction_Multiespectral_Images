@@ -658,7 +658,7 @@ def ReproduccionCie1931(imagenes_patron,shape_imag=(480,640,3),selec_imagenes='A
     #%  Reproduccion de color usando CIE
     
     xyz = np.dot(Coef,imagenes_patron[selec_imagenes,:]).T
-    xyz = xyz*2/N[1]
+    xyz = xyz/N[1]
     
     rgb = recorte(np.dot(XYZ2RGB,xyz.T).T)
     

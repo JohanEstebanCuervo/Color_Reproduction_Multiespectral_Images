@@ -43,7 +43,7 @@ imagenes_patron,shape_imag = fun.Read_Multiespectral_imag(carpeta1, lista_patron
 espectro = fun.Read_espectros_Imag(lista_patron)
 color_RGB_pixel_ideal = fun.Ideal_Color_patch_pixel(color_check, mascaras)
 pesos_ecu = fun.Pesos_ecualizacion(imagenes_patron[:-2], mascaras[18])
-im_RGB= fun.ReproduccionCie19312(imagenes_patron[:-2]/255,Pesos_ecu=pesos_ecu)
+im_RGB= fun.ReproduccionCie19312(imagenes_patron[:-2]/255,pesos_ecu)
 
 fun.imshow('Imagen reproducción CIE 1931',im_RGB)
 

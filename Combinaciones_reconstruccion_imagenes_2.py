@@ -43,12 +43,14 @@ grupo=1
 lista_patron=lista1[15*(grupo-1):15*grupo]
 
 imagenes_patron,shape_imag = fun.Read_Multiespectral_imag(carpeta1, lista_patron)
-imagenes_patron/=255
+pesos_ecu = fun.Pesos_ecualizacion(imagenes_patron, mascaras[18])
+imagenes_patron=(imagenes_patron.T*pesos_ecu).T/255
 #%% Combinaciones
 stuff = range(12)
 combinaciones=[]
 errores_comb=[]
-N=1
+N=11
+
 for Cant_Image in np.linspace(12,N,12-N+1):
     
     subset = list(itertools.combinations(stuff,int(Cant_Image)))

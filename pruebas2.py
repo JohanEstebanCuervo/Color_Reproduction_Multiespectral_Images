@@ -1,19 +1,15 @@
 # -*- coding: utf-8 -*-
 """
-Created on Fri Oct 29 02:15:02 2021
+Created on Sun Nov 14 13:22:19 2021
 
 @author: Johan Cuervo
 """
-
-
 import numpy as np
 from os import system
 import os
 import funciones_reproduccion_color as fun
+import multiprocessing as mp
 import itertools
-import cv2
-import matplotlib.pyplot as plt
-import pickle
 #%% borrar todo lo cargado anteriormente
 system("cls")
 
@@ -43,17 +39,14 @@ grupo=1
 lista_patron=lista1[15*(grupo-1):15*grupo]
 
 imagenes_patron,shape_imag = fun.Read_Multiespectral_imag(carpeta1, lista_patron)
-pesos_ecu = fun.Pesos_ecualizacion(imagenes_patron, mascaras[18])
-imagenes_patron=(imagenes_patron.T*pesos_ecu).T/255
-#%% Combinaciones
-stuff = range(12)
-combinaciones=[]
-errores_comb=[]
-N=8
+pesos_ecu = fun.Pesos_ecualizacion(imagenes_patron[:-3], mascaras[18])
+imagenes_patron=(imagenes_patron[:-3].T*pesos_ecu).T/255
 
-for Cant_Image in np.linspace(12,N,12-N+1):
-    
-    subset = list(itertools.combinations(stuff,int(Cant_Image)))
+Cant_Image=range(9,12)
+
+def mejor_combinacion(imagenes_patron,mascaras,color_check,Cant_Image):
+    stuff= range(np.shape(imagenes_patron)[0])
+    subset = list(itertools.combinations(stuff,Cant_Image))
     
     min_error=1000
     a=0
@@ -61,7 +54,7 @@ for Cant_Image in np.linspace(12,N,12-N+1):
         if(i/len(subset)*100>a):
             a+=10
             print('Cant imagenes'+str(int(Cant_Image))+' Avance:' + str("{0:.2f}".format(i/len(subset)*100))+str('%'))
-    #%%  Reproduccion de color usando CIE
+    # #%%  Reproduccion de color usando CIE
         
         im_RGB= fun.ReproduccionCie1931(imagenes_patron,selec_imagenes=Comb)
         #im_Lab= cv2.cvtColor(im_RGB, cv2.COLOR_RGB2LAB)
@@ -73,22 +66,19 @@ for Cant_Image in np.linspace(12,N,12-N+1):
             mejor_comb=Comb
         #fun.imshow('Imagen reproducción CIE 1931',im_RGB)
     
-    print(" ")
-    combinaciones +=[mejor_comb]
-    errores_comb +=[min_error]
     #%%  Reproduccion de color usando CIE
-    im_RGB= fun.ReproduccionCie1931(imagenes_patron[:-3],selec_imagenes=mejor_comb)
+    im_RGB= fun.ReproduccionCie1931(imagenes_patron,selec_imagenes=mejor_comb)
     fun.imshow('IR ERGB CIE 1931 im '+str(int(Cant_Image)),im_RGB)
-    fun.imwrite('Resultados/Imagenes\IR ERGB CIE 1931 im '+str(int(Cant_Image))+'.png',im_RGB)
+    # #imwrite('Resultados/Imagenes\IR ERGB CIE 1931 im '+str(int(Cant_Image))+'.png',im_RGB)
     
-    
-plt.figure(figsize=(4,3))
-plt.plot(np.linspace(12,N,12-N+1).astype(int),np.array(errores_comb),color='black')
-plt.title('Error RGB en funcion de las imagenes')
-plt.xlabel('Cantidad Im')
-plt.savefig('Resultados/Imagenes/Grafica_error_RGB.pdf', format='pdf')
-plt.show()
+    return mejor_comb,min_error
 
-fichero = open('Resultados/Variables/combinaciones_RGB.pickle','wb')
-pickle.dump(combinaciones,fichero)
-fichero.close()
+
+#mejor_comb, error = fun.mejor_combinacion(imagenes_patron, mascaras, color_check, cant)
+
+if __name__=='__main__':
+    pool   = mp.Pool(processes=mp.cpu_count())
+    
+    resultados=pool.starmap_async(mejor_combinacion,[(imagenes_patron, mascaras, color_check,cant)for cant in Cant_Image])
+    #resultados=pool.starmap_async(mejor_combinacion,[(imagenes_patron, mascaras, color_check,cant)for cant in Cant_Image])
+    

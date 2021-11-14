@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import os
 import pickle
+import itertools
 
 #Lectura de mascaras y colocación en una lista(cant mascaras) 
 def ext_mascaras(carpeta, lista):
@@ -726,5 +727,34 @@ def ReproduccionCie19312(imagenes_patron,Pesos_ecu,shape_imag=(480,640,3),selec_
     im_RGB=np.reshape(rgb,shape_imag)
     
     return im_RGB
+
+def mejor_combinacion(imagenes_patron,mascaras,color_check,Cant_Image):
+    stuff= range(np.shape(imagenes_patron)[0])
+    subset = list(itertools.combinations(stuff,Cant_Image))
+    
+    min_error=1000
+    a=0
+    for i,Comb in enumerate(subset):
+        if(i/len(subset)*100>a):
+            a+=10
+            print('Cant imagenes'+str(int(Cant_Image))+' Avance:' + str("{0:.2f}".format(i/len(subset)*100))+str('%'))
+    # #%%  Reproduccion de color usando CIE
+        
+        im_RGB= ReproduccionCie1931(imagenes_patron,selec_imagenes=Comb)
+        #im_Lab= cv2.cvtColor(im_RGB, cv2.COLOR_RGB2LAB)
+        errores = Error_de_reproduccion([im_RGB], mascaras, color_check)
+        error_media = np.mean(errores,axis=1)
+        #print(error_media)
+        if(error_media<min_error):
+            min_error=error_media
+            mejor_comb=Comb
+        #fun.imshow('Imagen reproducción CIE 1931',im_RGB)
+    
+    #%%  Reproduccion de color usando CIE
+    im_RGB= ReproduccionCie1931(imagenes_patron,selec_imagenes=mejor_comb)
+    imshow('IR ERGB CIE 1931 im '+str(int(Cant_Image)),im_RGB)
+    # #imwrite('Resultados/Imagenes\IR ERGB CIE 1931 im '+str(int(Cant_Image))+'.png',im_RGB)
+    
+    return mejor_comb,min_error
 
     

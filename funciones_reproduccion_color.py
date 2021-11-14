@@ -224,34 +224,17 @@ def imshow(titulo, imagen):
 
 # error de reproduccion distancia euclidea  pixel por pixel de cada parche
 # y promedio de error por parche para multiples imagenes reconstruidas
+
 def Error_de_reproduccion(imagenes_RGB, mascaras, color_check):
     error= []
     for imagen in imagenes_RGB:
-        R = (imagen[:,:,0]*255).astype(int)
-        G = (imagen[:,:,1]*255).astype(int)
-        B = (imagen[:,:,2]*255).astype(int)
-        for i,mascara in zip(range(len(mascaras)),mascaras):
-            difR=R[np.where(mascara==255)] -color_check[i,0]
-            difG=G[np.where(mascara==255)] -color_check[i,1]
-            difB=B[np.where(mascara==255)] -color_check[i,2]
-            DistEucl= np.sqrt(difR**2+difG**2+difB**2)
+        imagen=(imagen.reshape(-1,3)*255).astype(int)
+        for i,mascara in enumerate(mascaras):
+            indices=np.where(mascara.reshape(-1,)==255)
+            dif = imagen[indices] -color_check[i]
+            DistEucl= np.sqrt(np.sum(np.power(dif,2),axis=1))
             error.append(np.mean(DistEucl))
     return np.reshape(error,(-1,len(mascaras)))
-
-def Error_de_reproduccion2(imagenes_RGB, mascaras, color_check):
-    error= []
-    for imagen in imagenes_RGB:
-        R = imagen[:,:,0].astype(float)
-        G = imagen[:,:,1].astype(float)
-        B = imagen[:,:,2].astype(float)
-        for i,mascara in zip(range(len(mascaras)),mascaras):
-            difR=R[np.where(mascara==255)] -color_check[i,0]
-            difG=G[np.where(mascara==255)] -color_check[i,1]
-            difB=B[np.where(mascara==255)] -color_check[i,2]
-            DistEucl= np.sqrt(difR**2+difG**2+difB**2)
-            error.append(np.mean(DistEucl))
-    return np.reshape(error,(-1,len(mascaras)))
-
 
 #%% Funciones CCM para una imagen
 # Color Correction matriz linear
@@ -728,11 +711,11 @@ def ReproduccionCie19312(imagenes_patron,Pesos_ecu,shape_imag=(480,640,3),selec_
     
     return im_RGB
 
-def mejor_combinacion(imagenes_patron,mascaras,color_check,Cant_Image):
+def mejor_combinacion(imagenes_patron,mascaras,color_check,Cant_Image,type_error='mean',imagen_write='off'):
     stuff= range(np.shape(imagenes_patron)[0])
     subset = list(itertools.combinations(stuff,Cant_Image))
     
-    min_error=1000
+    min_error=1000000
     a=0
     for i,Comb in enumerate(subset):
         if(i/len(subset)*100>a):
@@ -743,18 +726,36 @@ def mejor_combinacion(imagenes_patron,mascaras,color_check,Cant_Image):
         im_RGB= ReproduccionCie1931(imagenes_patron,selec_imagenes=Comb)
         #im_Lab= cv2.cvtColor(im_RGB, cv2.COLOR_RGB2LAB)
         errores = Error_de_reproduccion([im_RGB], mascaras, color_check)
-        error_media = np.mean(errores,axis=1)
+        
+        error= error_funtions(errores,type_error)
         #print(error_media)
-        if(error_media<min_error):
-            min_error=error_media
+        if(error<min_error):
+            min_error=error
             mejor_comb=Comb
         #fun.imshow('Imagen reproducción CIE 1931',im_RGB)
     
     #%%  Reproduccion de color usando CIE
     im_RGB= ReproduccionCie1931(imagenes_patron,selec_imagenes=mejor_comb)
     imshow('IR ERGB CIE 1931 im '+str(int(Cant_Image)),im_RGB)
-    # #imwrite('Resultados/Imagenes\IR ERGB CIE 1931 im '+str(int(Cant_Image))+'.png',im_RGB)
-    
+    if (imagen_write=='on'):
+        imwrite('Resultados/Imagenes\IR ERGB CIE 1931 im '+str(int(Cant_Image))+'.png',im_RGB)
+        
     return mejor_comb,min_error
 
+def error_funtions(errores,type_error):
+    type_error= type_error.lower()
+    
+    if(type_error=='mean'):
+        error=np.mean(errores)
+    
+    if(type_error=='max'):
+        error=np.max(errores)
+        
+    if(type_error=='variance'):
+        error=np.var(errores)
+        
+    if(type_error=='mean_for_standard'):
+        error=np.mean(errores)*np.sqrt(np.var(errores))  
+        
+    return error
     

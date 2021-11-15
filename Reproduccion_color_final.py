@@ -44,6 +44,7 @@ grupo=1
 lista_patron=lista1[15*(grupo-1):15*grupo]
 
 imagenes_patron,shape_imag = fun.Read_Multiespectral_imag(carpeta1, lista_patron)
+
 espectro = fun.Read_espectros_Imag(lista_patron)
 color_RGB_pixel_ideal = fun.Ideal_Color_patch_pixel(color_check, mascaras)
 

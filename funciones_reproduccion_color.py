@@ -756,6 +756,9 @@ def error_funtions(errores,type_error):
         
     if(type_error=='mean_for_standard'):
         error=np.mean(errores)*np.sqrt(np.var(errores))  
-        
+    
+    if(type_error=='rango'):
+        error=np.max(errores)-np.min(errores)
+    
     return error
     

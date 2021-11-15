@@ -14,7 +14,7 @@ import keras
 #%% borrar todo lo cargado anteriormente
 system("cls")
 
-numero_imagenes=6
+numero_imagenes=12
 archivo='D:\Documentos\Articulo_Programas_Reproduccion_Color\Resultados\Datos_entrenamiento/Datos_train_Nim'+str(numero_imagenes)+'.csv'
 
 combinaciones= fun.Read_Variable('Resultados\Variables/'+'combinaciones_mean'+'.pickle')
@@ -53,8 +53,6 @@ im_RGB= fun.ReproduccionCie1931(imagenes_patron,selec_imagenes=combinaciones[num
 
 fun.imshow('Reproducción CIE 1931',im_RGB)
 
-fun.imwrite('Resultados/Imagenes/reproduccion CIE 1931_Nim_'+str(numero_imagenes)+'.png',im_RGB)
-
 #%% CMM TRANSFORM linear 
 
 Ccm_linear = fun.CCM_Linear_Train(archivo)
@@ -85,7 +83,7 @@ fun.imshow('Imagen mejorada mediante ccm logarithm', im_RGB4)
 #%% CMM TRANSFORM Polynomial
 
 Ccm_Polynomial = fun.CCM_Polynomial_Train(archivo)
-fun.Write_Variable('CCM_Polynomial_Nim'+str(numero_imagenes), Ccm_Polynomial)
+fun.Write_Variable('CCM_Polynomial_Nim_'+str(numero_imagenes), Ccm_Polynomial)
 im_RGB5 = fun.CCM_Polynomial_Test(im_RGB, Ccm_Polynomial)
 
 fun.imshow('Imagen mejorada mediante ccm Polynomial', im_RGB5)
@@ -106,7 +104,5 @@ imagenes= [im_RGB, im_RGB2, im_RGB3, im_RGB4 , im_RGB5, im_RGB6]
 errores = fun.Error_de_reproduccion(imagenes, mascaras, color_check)
 errores_media = np.mean(errores,axis=1)
 fun.Write_Variable('errores_de_ReyCorrec_Nim_'+str(numero_imagenes), errores)
-#%% Comparacion de parches 
-fun.comparacion_color_check('CIE 1931 utililizando '+str(numero_imagenes)+' espectros', im_RGB, color_check, mascaras,carpeta='Resultados/Imagenes')
-fun.comparacion_color_check('Polynomial utililizando '+str(numero_imagenes)+' espectros', im_RGB5, color_check, mascaras,carpeta='Resultados/Imagenes')
-fun.comparacion_color_check('red utililizando '+str(numero_imagenes)+' espectros', im_RGB6, color_check, mascaras,carpeta='Resultados/Imagenes')
+
+

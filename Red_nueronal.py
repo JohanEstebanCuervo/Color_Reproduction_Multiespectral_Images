@@ -10,7 +10,7 @@ import numpy as np
 from keras.models import Sequential
 from keras.layers import Dense
 
-numero_imagenes=6
+numero_imagenes=12
 archivo='D:\Documentos\Articulo_Programas_Reproduccion_Color\Resultados\Datos_entrenamiento/Datos_train_Nim'+str(numero_imagenes)+'.csv'
 datatrain = pd.read_csv(archivo, sep=',',names=range(1,7))
 datatrain= datatrain.to_numpy()
@@ -40,7 +40,7 @@ red.compile(optimizer='Adam',
 
 
 hist = red.fit(X_train, Y_train,
-          batch_size=20, epochs=10,
+          batch_size=20, epochs=7,
           validation_data=(X_val, Y_val))
 
 datatrain = pd.read_csv(archivo, sep=',',names=range(1,7))

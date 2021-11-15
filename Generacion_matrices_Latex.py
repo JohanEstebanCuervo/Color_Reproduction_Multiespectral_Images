@@ -36,9 +36,10 @@ for nombre in lista:
         file.write(texto)
         file.write('\n\\begin{bmatrix}\n  R \\\ G \\\ B \\\ 1 \n\end{bmatrix}\n')
         file.write('\end{equation}\n')
-        
         file.close()
-    
+
+#%% Geneacion de tablas de errores y graficas
+
     if nombre[:7]=='errores':
         errores = fun.Read_Variable(carpeta +'/'+ nombre).round(3)
         
@@ -92,6 +93,33 @@ for nombre in lista:
         file.write('  \end{center}\n')
         file.write('\end{table}\n')
         file.close()
+        
+# =============================================================================
+#         Tabla de errores de media
+# =============================================================================
+
+        file = open('Resultados/Formulas_Latex/'+'Tabla_medias_'+nombre_archivo+'.tex','w')
+        file.write('\\begin{table}[H]\n')
+        file.write('  \\begin{center}\n')
+        file.write('  \\resizebox{5cm}{!} {\n')
+        file.write('    \\begin{tabular}{l r r}\n')
+        file.write('    \multicolumn{2}{c}{\\textbf{Average error rate}} \\\ \hline \n')
+        
+        medias= np.mean(errores,axis=1).round(3)
+        
+        for fila in range(num_errores):
+            file.write('        ')
+            file.write('\\textbf{'+nombres[fila]+'}')
+            file.write(' & '+str(medias[fila])+'\\\ \n')
+        
+        
+        file.write('    \end{tabular}\n')
+        file.write('  }\n')
+        file.write('  \caption{Average errors of the proposed methods for '+nombre_archivo[-2:]+' images }\n')
+        file.write('  \end{center}\n')
+        file.write('\end{table}\n')
+        file.close()
+         
         
         plt.figure(figsize=(12,8))
         for i in range(num_errores):

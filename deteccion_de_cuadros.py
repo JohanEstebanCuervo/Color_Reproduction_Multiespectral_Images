@@ -19,12 +19,12 @@ import funciones_reproduccion_color as func
 import funciones_deteccion_cuadros as detec
 
 
-carpeta1 = 'patronTam'
+carpeta1 = 'carta_conluz/patron'
 #carpeta1 = 'imgs\Patron0'
 
 lista1 = os.listdir(carpeta1)
 
-carpetaguardado = 'mascarasTam/'
+carpetaguardado = 'carta_conluz/mascaras/'
 
 Mascaras, centros, centrosorg = detec.Principal(carpeta1,lista1[:15])
 

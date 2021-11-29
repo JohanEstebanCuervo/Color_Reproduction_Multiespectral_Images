@@ -19,7 +19,7 @@ system("cls")
 
 combinaciones= fun.Read_Variable('Resultados\Variables/'+'combinaciones_mean'+'.pickle')
 
-numero_imagenes = 6
+numero_imagenes = 5
 #%% barra de colores para mostrar grafico
 color_check = np.array([[116,81,67], [199,147,129], [91,122,156], [90,108,64], [130,128,176], [92,190,172],
               [224,124,47], [68,91,170], [198,82,97], [94,58,106], [159,189,63],  [230,162,39],

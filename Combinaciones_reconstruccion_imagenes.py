@@ -58,7 +58,7 @@ imagenes_patron=(imagenes_patron[:-3].T*pesos_ecu).T/255
 #%% Combinaciones
 
 type_errors=['mean','max','variance','mean_for_standard','rango']
-
+type_errors=['mean']
 for type_error in type_errors:
     mejores_comb=[]
     min_error = []

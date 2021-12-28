@@ -10,7 +10,7 @@ import numpy as np
 from keras.models import Sequential
 from keras.layers import Dense
 
-numero_imagenes=12
+numero_imagenes=11
 archivo='D:\Documentos\Articulo_Programas_Reproduccion_Color\Resultados\Datos_entrenamiento/Datos_train_Nim'+str(numero_imagenes)+'.csv'
 datatrain = pd.read_csv(archivo, sep=',',names=range(1,7))
 datatrain= datatrain.to_numpy()

@@ -157,6 +157,16 @@ def regresion_puntos(centros,order_index):
     pendiente = modelo.coef_
     angulo = np.arctan(pendiente) #*180/np.pi
     return modelo, angulo
+
+def regresion_lineal(puntos):
+    X= puntos[:,0]
+    Y= puntos[:,1]
+   
+    modelo = LinearRegression()
+    modelo.fit(X=X.reshape(-1,1),y=Y.reshape(-1,1))
+    pendiente = modelo.coef_
+    intercepto = modelo.intercept_
+    return pendiente, intercepto
     
 def rotar_imagen(imagen,angulo,eje):
     
@@ -191,9 +201,7 @@ def completar_centros(centros,ang_est):
         order_index=0
 
     centros_tras= np.divide(centros_tras-mini,spam)
-
-    centros_int=np.round(centros_tras)
-    
+    centros_int=np.round(centros_tras).astype(int)
     error= np.max(np.abs(centros_tras-centros_int))*np.max(spam)
     print('error estimado de posicion: '+str(error))
     faltantes=[]
@@ -208,10 +216,12 @@ def completar_centros(centros,ang_est):
             if(bandera==0):
                 faltantes=np.append(faltantes,c)
     faltantes=np.reshape(faltantes,(-1,2))  
+
     
     centros_tras=np.concatenate((centros_tras,faltantes))
     
     centros_tras= centros_tras[np.argsort(centros_tras[:,order_index]).T]
+
     for i in range(4):
         parte=np.copy(centros_tras[i*6:i*6+ 6,:])
         parte= parte[np.argsort(parte[:,1-order_index]).T]
@@ -219,8 +229,87 @@ def completar_centros(centros,ang_est):
         
     centros_tras= centros_tras*spam+mini
     centros = np.dot(np.linalg.inv(M),centros_tras.T).T
-    
+
     return centros, error, order_index
+
+def completar_centros2(centros,ang_est):
+    error=0
+    M=np.array([
+        [np.cos(ang_est), -np.sin(ang_est)],
+        [np.sin(ang_est), np.cos(ang_est)],
+        ])
+  
+    centros_tras=np.copy(centros)
+    centros_tras= np.dot(M,centros_tras.T).T
+     
+    centros_tras= centros_tras[np.argsort(centros_tras[:,1]).T]
+    maxi,mini= np.max(centros_tras,axis=0),np.min(centros_tras,axis=0)
+    spam= maxi-mini
+    if(spam[0]>spam[1]):
+        spam = np.divide(spam,(5,3))
+        order_index=1
+    else:
+        spam = np.divide(spam,(3,5))
+        order_index=0
+
+    centros_tras= np.divide(centros_tras-mini,spam)
+    centros_int=np.round(centros_tras).astype(int)
+    faltantes=[]
+    for i in range(int(np.max(centros_int[:,0])+1)):
+        for j in range(int(np.max(centros_int[:,1])+1)):
+            bandera=0
+            c=np.array([i,j])
+            for k in centros_int:
+                if(np.array_equal(k,c)==True):
+                    bandera=1
+                    continue
+            if(bandera==0):
+                faltantes=np.append(faltantes,c)
+    faltantes_int=np.reshape(faltantes,(-1,2))  
+    try:
+        faltantes_tras=[]
+        for centro_fal in faltantes_int:
+            #regresion en direccion 1
+            centros=[]
+            for i,centro_list in enumerate(centros_int):
+                if centro_fal[0]==centro_list[0]:
+                    centros = np.append(centros,centros_tras[i])
+            centros=np.reshape(centros,(-1,2))
+            
+            m1,b1 = regresion_lineal(centros)
+            
+            #regresion en direccion 2
+            centros=[]
+            for i,centro_list in enumerate(centros_int):
+                if centro_fal[1]==centro_list[1]:
+                    centros = np.append(centros,centros_tras[i])
+            centros=np.reshape(centros,(-1,2))
+            
+            m2,b2 = regresion_lineal(centros)
+            
+            X = (b2-b1)/(m1-m2)
+            Y = m1*X+b1
+            
+            faltantes_tras = np.append(faltantes_tras,[X,Y])
+        faltantes_tras = np.reshape(faltantes_tras,(-1,2))
+        centros_tras=np.concatenate((centros_tras,faltantes_tras))
+    except:
+        error= np.max(np.abs(centros_tras-centros_int))*np.max(spam)
+        print('error estimado de posicion: '+str(error))
+        centros_tras=np.concatenate((centros_tras,faltantes_int))
+    
+    
+    centros_tras= centros_tras[np.argsort(centros_tras[:,order_index]).T]
+    
+    for i in range(4):
+        parte=np.copy(centros_tras[i*6:i*6+ 6,:])
+        parte= parte[np.argsort(parte[:,1-order_index]).T]
+        centros_tras[i*6:i*6+ 6,:]=parte
+        
+    centros_tras= centros_tras*spam+mini
+    centros = np.dot(np.linalg.inv(M),centros_tras.T).T
+
+    return centros,error, order_index
 
 def Mascaras(centros,tamanio_im,angulo,tamanio_cuadro):
     
@@ -249,12 +338,12 @@ def organizar_centros(centros,tamanio_im,angulo,tamanio_cuadro,carpeta,lista):
         mascara= rotar_imagen(mascara,angulo,np.flip(centros[pos_centro]))
         _,mascara= cv2.threshold(mascara, 128, 255, cv2.THRESH_BINARY)
         a=len(np.where(mascara==255)[0])
-        print('tamaño mascara'+str(a))
         for nombre in lista: 
             imagen = cv2.cvtColor(cv2.imread(carpeta+"/"+nombre), cv2.COLOR_BGR2GRAY)
             imagen = modificar_imagen(imagen)
             suma[i] = suma[i] + np.sum(imagen[np.where(mascara==255)]) / a
-        
+    
+    print('tamaño mascara '+str(a)+' pixeles')   
     argmax = np.argmax(suma)
 
     if(argmax==0):
@@ -283,17 +372,16 @@ def Principal(carpeta, lista,mostrar_imagenes='off'):
     contornos, aristas = Contornos_cuadrados(contornos)
     
     imagen=np.zeros((tamanioim),dtype='uint8')
-    contornos= np.array(contornos)
-    
+    contornos= np.array(contornos,dtype=object)
     cv2.drawContours(imagen, contornos,-1, (255,255,255),2)
     func.imshow('contornos', imagen/255)
     
     contornos_fil,centros= filt_Contornos(contornos, aristas)
       
-    
+    print("Cuardros detectados: "+str(len(centros)))
     
     angulo_est,tamanio_cuadro = estimacion_anguloytamanio(contornos_fil)
-    centros_int, error,order_index= completar_centros(centros,-angulo_est)
+    centros_int, error,order_index= completar_centros2(centros,-angulo_est)
     
        
     
@@ -312,7 +400,7 @@ def Principal(carpeta, lista,mostrar_imagenes='off'):
     cv2.drawContours(imagen, contornos_fil,-1, (255,255,255),2)  
     lista= [centros_int[:,1],centros_int[:,0]]
     print(centros_int)
-    imagen[lista]=255
+    imagen[tuple(lista)]=255
     func.imshow('contornos filtrados', imagen/255)
     
     
@@ -320,9 +408,9 @@ def Principal(carpeta, lista,mostrar_imagenes='off'):
     for i in range(len(mascaras)):
         imagen+= mascaras[i]
     
-    imagen1+=imagen
+    imagen_mascaras = imagen1.astype(int)+imagen.astype(int)
     func.imshow('mascaras', imagen/255)
-    func.imshow('imagen con mascaras',imagen1/255)
+    func.imshow('imagen con mascaras',func.recorte(imagen_mascaras/255))
     
     return mascaras, centros_int , centros_org
     

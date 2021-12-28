@@ -16,10 +16,12 @@ import keras
 system("cls")
 archivo='D:\Documentos\Articulo_Programas_Reproduccion_Color\Resultados\Datos_entrenamiento/Datos_entrenamiento.csv'
 
-numero_imagenes=12
+numero_imagenes=11
 
 red = keras.models.load_model('Resultados/Variables/Correction_color_neuronal_red_Nim'+str(numero_imagenes)+'.h5')
 combinaciones= fun.Read_Variable('Resultados\Variables/'+'combinaciones_mean'+'.pickle')
+combinaciones[4]= [1, 4,6,10,11] #se cambia para este codigo al no contar con un led de 410 nm
+combinaciones[10]= [1,2,3, 4,5,6,7,8,9,10,11] #se cambia para este codigo al no contar con un led de 410 nm
 #%% barra de colores para mostrar grafico
 color_check = np.array([[116,81,67], [199,147,129], [91,122,156], [90,108,64], [130,128,176], [92,190,172],
               [224,124,47], [68,91,170], [198,82,97], [94,58,106], [159,189,63],  [230,162,39],
@@ -30,12 +32,12 @@ color_check = np.array([[116,81,67], [199,147,129], [91,122,156], [90,108,64], [
 
 #%% busqueda de los archivos en las carpetas correspondientes
 
-carpeta1 = 'carta_conluz/patron'
-carpeta2 = 'carta_conluz/mascaras'
+carpeta1 = 'Fotos_nuevas/patron'
+carpeta2 = 'Fotos_nuevas/mascaras'
 lista1 = os.listdir(carpeta1)
 lista2 = os.listdir(carpeta2)
 
-imwrite='off'
+imwrite='on'
 
 #%% mascaras 
 
@@ -48,7 +50,7 @@ lista_patron=lista1[15*(grupo-1):15*grupo]
 imagenes_patron,shape_imag = fun.Read_Multiespectral_imag(carpeta1, lista_patron)
 pesos_ecu = fun.Pesos_ecualizacion(imagenes_patron[:-3], mascaras[18])
 imagenes_patron=(imagenes_patron[:-3].T*pesos_ecu).T/255
-espectro = fun.Read_espectros_Imag(lista_patron)
+#espectro = fun.Read_espectros_Imag(lista_patron)
 color_RGB_pixel_ideal = fun.Ideal_Color_patch_pixel(color_check, mascaras)
 
 im_RGB= fun.ReproduccionCie1931(imagenes_patron,selec_imagenes=combinaciones[numero_imagenes-1])

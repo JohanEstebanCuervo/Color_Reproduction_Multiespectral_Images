@@ -11,8 +11,16 @@ import os
 import funciones_reproduccion_color as fun
 import cv2
 import keras
+
 #%% borrar todo lo cargado anteriormente
 system("cls")
+archivo='D:\Documentos\Articulo_Programas_Reproduccion_Color\Resultados\Datos_entrenamiento/Datos_entrenamiento.csv'
+
+numero_imagenes=5
+
+red = keras.models.load_model('Resultados/Variables/Correction_color_neuronal_red_Nim'+str(numero_imagenes)+'.h5')
+combinaciones= fun.Read_Variable('Resultados\Variables/'+'combinaciones_mean'+'.pickle')
+combinaciones[4]= [1, 4,6,10,11] #se cambia para este codigo al no contar con un led de 410 nm
 
 #%% barra de colores para mostrar grafico
 color_check = np.array([[116,81,67], [199,147,129], [91,122,156], [90,108,64], [130,128,176], [92,190,172],
@@ -24,9 +32,8 @@ color_check = np.array([[116,81,67], [199,147,129], [91,122,156], [90,108,64], [
 
 #%% busqueda de los archivos en las carpetas correspondientes
 
-carpeta1 = 'informacion/patron'
-carpeta1 = 'D:\Documentos\Articulo_Programas_Reproduccion_Color\Informacion\patron'
-carpeta2 = 'informacion/mascaras'
+carpeta1 = 'Fotos_nuevas/patron'
+carpeta2 = 'Fotos_nuevas/mascaras'
 lista1 = os.listdir(carpeta1)
 lista2 = os.listdir(carpeta2)
 
@@ -36,18 +43,19 @@ lista2 = os.listdir(carpeta2)
 mascaras=fun.ext_mascaras(carpeta2, lista2)
   
 #%% Organizacion de las imagenes, promedios de parches y espectro
+#%% Organizacion de las imagenes, promedios de parches y espectro
 grupo=1
 lista_patron=lista1[15*(grupo-1):15*grupo]
 
 imagenes_patron,shape_imag = fun.Read_Multiespectral_imag(carpeta1, lista_patron)
-espectro = fun.Read_espectros_Imag(lista_patron)
+pesos_ecu = fun.Pesos_ecualizacion(imagenes_patron[:-3], mascaras[18])
+imagenes_patron=(imagenes_patron[:-3].T*pesos_ecu).T/255
+#espectro = fun.Read_espectros_Imag(lista_patron)
 color_RGB_pixel_ideal = fun.Ideal_Color_patch_pixel(color_check, mascaras)
 
-im_RGB= fun.ReproduccionCie1931(imagenes_patron)
+im_RGB= fun.ReproduccionCie1931(imagenes_patron,selec_imagenes=combinaciones[numero_imagenes-1])
 
-fun.imshow('Imagen reproducción CIE 1931',im_RGB)
-
-fun.imwrite('Resultados/Imagenes/Imagen reproduccion CIE 1931.png',im_RGB)
+fun.imshow('Reproducción CIE 1931',im_RGB)
 
 
 #%% CMM TRANSFORM linear 
@@ -74,17 +82,15 @@ fun.imshow('Imagen mejorada mediante ccm logarithm', im_RGB5)
 
 im_RGB7,Ccm_Polynomial, r2 = fun.CCM_Polynomial(im_RGB, color_RGB_pixel_ideal, mascaras)
 fun.imshow('Imagen mejorada mediante ccm Polynomial', im_RGB7)
-fun.imwrite('Resultados/Imagenes/Imagen reproduccion Polynomial.png',im_RGB7)
 
 media_parches = fun.RGB_IN_mean(im_RGB7, mascaras)*255
 #%% Red neuronal
-red = keras.models.load_model('Resultados/Variables/Correction_color_neuronal_red.h5')
 rgb= np.reshape(im_RGB,(-1,3))*255
 predic = red.predict(rgb)/255
 #predic = (predic*255).astype(int)
 im_RGB8 = np.reshape(predic,np.append(shape_imag,3))
 fun.imshow('Imagen mejorada mediante Red neuronal', im_RGB8)
-fun.imwrite('Resultados/Imagenes/Imagen reproduccion Red neuronal.png',im_RGB8)
+
 
 #%% Errores
 
@@ -92,6 +98,3 @@ imagenes= [im_RGB, im_RGB3, im_RGB4 , im_RGB5, im_RGB7, im_RGB8]
 errores = fun.Error_de_reproduccion(imagenes, mascaras, color_check)
 errores_media = np.mean(errores,axis=1)
 
-#%% Comparacion de parches 
-fun.comparacion_color_check('CIE 1931', im_RGB, color_check, mascaras,carpeta='Resultados/Imagenes')
-fun.comparacion_color_check('Polynomial', im_RGB7, color_check, mascaras,carpeta='Resultados/Imagenes')

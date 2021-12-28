@@ -11,7 +11,7 @@ import pandas as pd
 import os
 import pickle
 import itertools
-
+from math import ceil
 #Lectura de mascaras y colocación en una lista(cant mascaras) 
 def ext_mascaras(carpeta, lista):
     mascaras=[]
@@ -575,12 +575,16 @@ def comparacion_color_check(nombre,im_RGB,color_check_RGB,mascaras,carpeta=''):
         for j in range(6):
             
             parchei=im_RGB[np.where(255==mascaras[6*i+j])]*255
-            if len(np.where(255==mascaras[6*i+j])[0])<3600:
-                longitud=3600-len(np.where(255==mascaras[6*i+j])[0])
-                parchei = np.concatenate((parchei,parchei[:longitud,:]))
-            if len(np.where(255==mascaras[6*i+j])[0])>3600:
+            Tam = 3600 / len(np.where(255==mascaras[6*i+j])[0])
+            if Tam>1:
+                parchecopy=parchei.copy()
+                for k in range(int(Tam)):
+                    parchei = np.concatenate((parchei,parchecopy))
+
+            if len(parchei)>3600:
                 parchei = parchei[:3600,:]
             parchei=np.reshape(parchei,(60,60,3)).astype(int)
+            
             fila = np.concatenate((fila,parchei),axis=1)
             fila = np.concatenate((fila,np.zeros((60,Grosor,3))),axis=1)
             
@@ -734,13 +738,38 @@ def mejor_combinacion(imagenes_patron,mascaras,color_check,Cant_Image,type_error
             mejor_comb=Comb
         #fun.imshow('Imagen reproducción CIE 1931',im_RGB)
     
-    #%%  Reproduccion de color usando CIE
+    
     im_RGB= ReproduccionCie1931(imagenes_patron,selec_imagenes=mejor_comb)
     imshow('IR ERGB CIE 1931 im '+str(int(Cant_Image)),im_RGB)
     if (imagen_write=='on'):
         imwrite('Resultados/Imagenes\IR ERGB CIE 1931 im '+str(int(Cant_Image))+'.png',im_RGB)
         
     return mejor_comb,min_error
+
+def combinaciones_lista_errores(imagenes_patron,mascaras,color_check,Cant_Image,type_error='mean',imagen_write='off'):
+    stuff= range(np.shape(imagenes_patron)[0])
+    subset = list(itertools.combinations(stuff,Cant_Image))
+    
+    lista = []
+    a=0
+    for i,Comb in enumerate(subset):
+        if(i/len(subset)*100>a):
+            a+=10
+            print('Cant imagenes'+str(int(Cant_Image))+' Avance:' + str("{0:.2f}".format(i/len(subset)*100))+str('%'))
+    # #%%  Reproduccion de color usando CIE
+        
+        im_RGB= ReproduccionCie1931(imagenes_patron,selec_imagenes=Comb)
+        #im_Lab= cv2.cvtColor(im_RGB, cv2.COLOR_RGB2LAB)
+        errores = Error_de_reproduccion([im_RGB], mascaras, color_check)
+        
+        error= error_funtions(errores,type_error)
+        #print(error_media)
+        lista+= list(Comb)
+        lista+= [error]
+        #fun.imshow('Imagen reproducción CIE 1931',im_RGB)
+        
+    lista = np.reshape(lista,(len(subset),Cant_Image+1))
+    return lista
 
 def error_funtions(errores,type_error):
     type_error= type_error.lower()

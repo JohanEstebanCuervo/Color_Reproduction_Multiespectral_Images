@@ -50,6 +50,7 @@ imagenes_patron=(imagenes_patron[:-3].T*pesos_ecu).T/255
 espectro = fun.Read_espectros_Imag(lista_patron)
 color_RGB_pixel_ideal = fun.Ideal_Color_patch_pixel(color_check, mascaras)
 imagenes=[]
+
 for type_error in type_errors:
     combinaciones = fun.Read_Variable('Resultados\Variables/'+'combinaciones_'+type_error+'.pickle')
     

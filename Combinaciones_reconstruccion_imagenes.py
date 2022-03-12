@@ -25,7 +25,7 @@ def graficas_error(min_error,nombre):
     fichero.close()
 
 #%% borrar todo lo cargado anteriormente
-system("cls")
+#system("cls")
 
 #%% barra de colores para mostrar grafico
 color_check = np.array([[116,81,67], [199,147,129], [91,122,156], [90,108,64], [130,128,176], [92,190,172],
@@ -38,7 +38,7 @@ color_check = np.array([[116,81,67], [199,147,129], [91,122,156], [90,108,64], [
 #%% busqueda de los archivos en las carpetas correspondientes
 
 carpeta1 = 'informacion/patron'
-carpeta1 = 'D:\Documentos\Articulo_Programas_Reproduccion_Color\Informacion\patron'
+#carpeta1 = ':\Documentos\Articulo_Programas_Reproduccion_Color\Informacion\patron'
 carpeta2 = 'informacion/mascaras'
 lista1 = os.listdir(carpeta1)
 lista2 = os.listdir(carpeta2)
@@ -57,13 +57,13 @@ pesos_ecu = fun.Pesos_ecualizacion(imagenes_patron[:-3], mascaras[18])
 imagenes_patron=(imagenes_patron[:-3].T*pesos_ecu).T/255
 #%% Combinaciones
 
-type_errors=['mean','max','variance','mean_for_standard','rango']
+#type_errors=['mean','max','variance','mean_for_standard','rango']
 type_errors=['mean']
 for type_error in type_errors:
     mejores_comb=[]
     min_error = []
     for cant_imagenes in range(1,13):
-        comb, error = fun.mejor_combinacion(imagenes_patron, mascaras, color_check,cant_imagenes,type_error=type_error)
+        comb, error = fun.mejor_combinacion(imagenes_patron, mascaras, fun.sRGB2Lab(color_check),cant_imagenes,type_error=type_error,OutColorSpace="Lab")
         mejores_comb.append(comb)
         min_error.append(error)
     

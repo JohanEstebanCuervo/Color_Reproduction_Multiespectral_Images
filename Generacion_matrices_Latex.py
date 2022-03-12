@@ -40,7 +40,7 @@ for nombre in lista:
 
 #%% Geneacion de tablas de errores y graficas
 
-    if nombre[:7]=='errores':
+    if nombre[:11]=='errores_de_':
         errores = fun.Read_Variable(carpeta +'/'+ nombre).round(3)
         
         nombre_archivo = nombre[:nombre.find('.')]

@@ -7,16 +7,15 @@ Created on Thu Nov  4 22:24:32 2021
 
 
 import numpy as np
-from os import system
 import os
 import funciones_reproduccion_color as fun
 import keras
 
 #%% borrar todo lo cargado anteriormente
-system("cls")
-archivo='D:\Documentos\Articulo_Programas_Reproduccion_Color\Resultados\Datos_entrenamiento/Datos_entrenamiento.csv'
+#system("cls")
 
-numero_imagenes=11
+
+numero_imagenes=4
 
 red = keras.models.load_model('Resultados/Variables/Correction_color_neuronal_red_Nim'+str(numero_imagenes)+'.h5')
 combinaciones= fun.Read_Variable('Resultados\Variables/'+'combinaciones_mean'+'.pickle')
@@ -32,8 +31,8 @@ color_check = np.array([[116,81,67], [199,147,129], [91,122,156], [90,108,64], [
 
 #%% busqueda de los archivos en las carpetas correspondientes
 
-carpeta1 = 'Fotos_nuevas/patron'
-carpeta2 = 'Fotos_nuevas/mascaras'
+carpeta1 = 'informacion/patron'
+carpeta2 = 'informacion/mascaras'
 lista1 = os.listdir(carpeta1)
 lista2 = os.listdir(carpeta2)
 
@@ -50,8 +49,7 @@ lista_patron=lista1[15*(grupo-1):15*grupo]
 imagenes_patron,shape_imag = fun.Read_Multiespectral_imag(carpeta1, lista_patron)
 pesos_ecu = fun.Pesos_ecualizacion(imagenes_patron[:-3], mascaras[18])
 imagenes_patron=(imagenes_patron[:-3].T*pesos_ecu).T/255
-#espectro = fun.Read_espectros_Imag(lista_patron)
-color_RGB_pixel_ideal = fun.Ideal_Color_patch_pixel(color_check, mascaras)
+color_RGB_pixel_ideal = fun.Ideal_Color_Patch_pixel(color_check, mascaras)
 
 im_RGB= fun.ReproduccionCie1931(imagenes_patron,selec_imagenes=combinaciones[numero_imagenes-1])
 
@@ -64,56 +62,61 @@ if imwrite == 'on':
 
 Ccm_linear = fun.Read_Variable('Resultados\Variables/'+'CCM_Linear_Nim_'+str(numero_imagenes)+'.pickle')
 
-im_RGB2 = fun.CCM_Linear_Test(im_RGB, Ccm_linear)
-fun.imshow('Imagen mejorada mediante con linear', im_RGB2)
+im_RGB_Linear = fun.CCM_Linear_Test(im_RGB, Ccm_linear)
+fun.imshow('Imagen mejorada mediante con linear', im_RGB_Linear)
 if imwrite == 'on':
-    fun.imwrite('Resultados/Imagenes/Correcion_Lineal_Nim_'+str(numero_imagenes)+'.png',im_RGB2)
+    fun.imwrite('Resultados/Imagenes/Correcion_Lineal_Nim_'+str(numero_imagenes)+'.png',im_RGB_Linear)
 
 #%% CMM TRANSFORM Compund 
 
 Ccm_Compound = fun.Read_Variable('Resultados\Variables/'+'CCM_Compound_Nim_'+str(numero_imagenes)+'.pickle')
 
-im_RGB3 = fun.CCM_Compound_Test(im_RGB, Ccm_Compound)
-fun.imshow('Imagen mejorada mediante ccm compund', im_RGB3)
+im_RGB_Compound = fun.CCM_Compound_Test(im_RGB, Ccm_Compound)
+fun.imshow('Imagen mejorada mediante ccm compund', im_RGB_Compound)
 if imwrite == 'on':
-    fun.imwrite('Resultados/Imagenes/Correcion_Compound_Nim_'+str(numero_imagenes)+'.png',im_RGB2)
+    fun.imwrite('Resultados/Imagenes/Correcion_Compound_Nim_'+str(numero_imagenes)+'.png',im_RGB_Compound)
 
 #%% CMM TRANSFORM logarithm
 
 Ccm_Logarithm = fun.Read_Variable('Resultados\Variables/'+'CCM_Logarithm_Nim_'+str(numero_imagenes)+'.pickle')
 
-im_RGB4 = fun.CCM_Logarithm_Test(im_RGB, Ccm_Logarithm)
-fun.imshow('Imagen mejorada mediante ccm logarithm', im_RGB4)
+im_RGB_Logarithm = fun.CCM_Logarithm_Test(im_RGB, Ccm_Logarithm)
+fun.imshow('Imagen mejorada mediante ccm logarithm', im_RGB_Logarithm)
 if imwrite == 'on':
-    fun.imwrite('Resultados/Imagenes/Correcion_Logarithm_Nim_'+str(numero_imagenes)+'.png',im_RGB2)
+    fun.imwrite('Resultados/Imagenes/Correcion_Logarithm_Nim_'+str(numero_imagenes)+'.png',im_RGB_Logarithm)
 
 #%% CMM TRANSFORM Polynomial
 
 Ccm_Polynomial = fun.Read_Variable('Resultados\Variables/'+'CCM_Polynomial_Nim_'+str(numero_imagenes)+'.pickle')
 
-im_RGB5 = fun.CCM_Polynomial_Test(im_RGB, Ccm_Polynomial)
-fun.imshow('Imagen mejorada mediante ccm Polynomial', im_RGB5)
+im_RGB_Polynomial = fun.CCM_Polynomial_Test(im_RGB, Ccm_Polynomial)
+fun.imshow('Imagen mejorada mediante ccm Polynomial', im_RGB_Polynomial)
 if imwrite == 'on':
-    fun.imwrite('Resultados/Imagenes/Correcion_Polynomial_Nim_'+str(numero_imagenes)+'.png',im_RGB2)
+    fun.imwrite('Resultados/Imagenes/Correcion_Polynomial_Nim_'+str(numero_imagenes)+'.png',im_RGB_Polynomial)
 
-#%% Red neuronal3
+#%% Red neuronal
+
 rgb= np.reshape(im_RGB,(-1,3))
 predic = red.predict(rgb*0.8+0.1)
-#predic = (predic*255).astype(int)
-im_RGB6 = np.reshape(predic,(480,640,3))/255
-fun.imshow('Imagen mejorada mediante Red neuronal', im_RGB6)
+
+im_RGB_NN = fun.recorte(np.reshape(predic,(480,640,3))/255)
+fun.imshow('Imagen mejorada mediante Red neuronal', im_RGB_NN)
+
 if imwrite == 'on':
-    fun.imwrite('Resultados/Imagenes/Correcion_RedNeuronal_Nim_'+str(numero_imagenes)+'.png',im_RGB2)
-
-
+    fun.imwrite('Resultados/Imagenes/Correcion_RedNeuronal_Nim_'+str(numero_imagenes)+'.png',im_RGB_NN)
+    
 #%% Errores
 
-imagenes= [im_RGB, im_RGB2, im_RGB3, im_RGB4 , im_RGB5, im_RGB6]
-errores = fun.Error_de_reproduccion(imagenes, mascaras, color_check)
+imagenes= [fun.sRGB2Lab(im_RGB),fun.sRGB2Lab( im_RGB_Linear),fun.sRGB2Lab( im_RGB_Compound),fun.sRGB2Lab( im_RGB_Logarithm), fun.sRGB2Lab(im_RGB_Polynomial),fun.sRGB2Lab( im_RGB_NN)]
+errores = fun.Error_de_reproduccion(imagenes, mascaras,fun.sRGB2Lab( color_check))
 errores_media = np.mean(errores,axis=1)
+
 
 #%% Comparacion de parches 
 if imwrite == 'on':
     fun.comparacion_color_check('CIE_1931_Nim_'+str(numero_imagenes)+' espectros', im_RGB, color_check, mascaras,carpeta='Resultados/Imagenes')
-    fun.comparacion_color_check('Polynomial_Nim_'+str(numero_imagenes)+' espectros', im_RGB5, color_check, mascaras,carpeta='Resultados/Imagenes')
-    fun.comparacion_color_check('RedNeuronal_Nim_'+str(numero_imagenes)+' espectros', im_RGB6, color_check, mascaras,carpeta='Resultados/Imagenes')
+    fun.comparacion_color_check('Linear_Nim_'+str(numero_imagenes)+' espectros', im_RGB_Linear, color_check, mascaras,carpeta='Resultados/Imagenes')
+    fun.comparacion_color_check('Compound_Nim_'+str(numero_imagenes)+' espectros', im_RGB_Compound, color_check, mascaras,carpeta='Resultados/Imagenes')
+    fun.comparacion_color_check('Logarithm_Nim_'+str(numero_imagenes)+' espectros', im_RGB_Logarithm, color_check, mascaras,carpeta='Resultados/Imagenes')
+    fun.comparacion_color_check('Polynomial_Nim_'+str(numero_imagenes)+' espectros', im_RGB_Polynomial, color_check, mascaras,carpeta='Resultados/Imagenes')
+    fun.comparacion_color_check('RedNeuronal_Nim_'+str(numero_imagenes)+' espectros', im_RGB_NN, color_check, mascaras,carpeta='Resultados/Imagenes')

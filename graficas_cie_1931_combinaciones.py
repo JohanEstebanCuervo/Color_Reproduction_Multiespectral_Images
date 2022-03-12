@@ -41,7 +41,6 @@ color_check = np.array([[116,81,67], [199,147,129], [91,122,156], [90,108,64], [
 #%% busqueda de los archivos en las carpetas correspondientes
 
 carpeta1 = 'informacion/patron'
-carpeta1 = 'D:\Documentos\Articulo_Programas_Reproduccion_Color\Informacion\patron'
 carpeta2 = 'informacion/mascaras'
 lista1 = os.listdir(carpeta1)
 lista2 = os.listdir(carpeta2)
@@ -59,7 +58,7 @@ imagenes_patron,shape_imag = fun.Read_Multiespectral_imag(carpeta1, lista_patron
 pesos_ecu = fun.Pesos_ecualizacion(imagenes_patron[:-3], mascaras[18])
 imagenes_patron=(imagenes_patron[:-3].T*pesos_ecu).T/255
 espectro = fun.Read_espectros_Imag(lista_patron)
-color_RGB_pixel_ideal = fun.Ideal_Color_patch_pixel(color_check, mascaras)
+color_RGB_pixel_ideal = fun.Ideal_Color_Patch_pixel(color_check, mascaras)
 
 for i,Comb in enumerate(Combinaciones):
     indices= indice[list(Comb)]

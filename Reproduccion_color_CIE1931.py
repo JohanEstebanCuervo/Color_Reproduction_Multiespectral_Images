@@ -13,7 +13,7 @@ import cv2
 import keras
 
 #%% borrar todo lo cargado anteriormente
-system("cls")
+#system("cls")
 archivo='D:\Documentos\Articulo_Programas_Reproduccion_Color\Resultados\Datos_entrenamiento/Datos_entrenamiento.csv'
 
 numero_imagenes=5
@@ -51,7 +51,7 @@ imagenes_patron,shape_imag = fun.Read_Multiespectral_imag(carpeta1, lista_patron
 pesos_ecu = fun.Pesos_ecualizacion(imagenes_patron[:-3], mascaras[18])
 imagenes_patron=(imagenes_patron[:-3].T*pesos_ecu).T/255
 #espectro = fun.Read_espectros_Imag(lista_patron)
-color_RGB_pixel_ideal = fun.Ideal_Color_patch_pixel(color_check, mascaras)
+color_RGB_pixel_ideal = fun.Ideal_Color_Patch_pixel(color_check, mascaras)
 
 im_RGB= fun.ReproduccionCie1931(imagenes_patron,selec_imagenes=combinaciones[numero_imagenes-1])
 
@@ -61,8 +61,8 @@ fun.imshow('Reproducción CIE 1931',im_RGB)
 #%% CMM TRANSFORM linear 
 
 
-im_RGB3,Ccm_lineal = fun.CCM_Linear(im_RGB, color_RGB_pixel_ideal, mascaras)
-
+im_RGB3,Ccm_lineal = fun.CCM_Linear(im_RGB, color_RGB_pixel_ideal/255, mascaras)
+im_RGB3 = fun.recorte(im_RGB3)
 fun.imshow('Imagen mejorada mediante ccm lineal', im_RGB3)
 
 #%% CMM TRANSFORM Compund 
@@ -80,21 +80,30 @@ fun.imshow('Imagen mejorada mediante ccm logarithm', im_RGB5)
 
 #%% CMM TRANSFORM Polynomial
 
-im_RGB7,Ccm_Polynomial, r2 = fun.CCM_Polynomial(im_RGB, color_RGB_pixel_ideal, mascaras)
+im_RGB7,Ccm_Polynomial = fun.CCM_Polynomial(im_RGB, color_RGB_pixel_ideal, mascaras)
 fun.imshow('Imagen mejorada mediante ccm Polynomial', im_RGB7)
 
-media_parches = fun.RGB_IN_mean(im_RGB7, mascaras)*255
+
 #%% Red neuronal
-rgb= np.reshape(im_RGB,(-1,3))*255
+rgb= np.reshape(im_RGB,(-1,3))
 predic = red.predict(rgb)/255
 #predic = (predic*255).astype(int)
-im_RGB8 = np.reshape(predic,np.append(shape_imag,3))
+im_RGB8 = fun.recorte(np.reshape(predic,np.append(shape_imag,3)))
 fun.imshow('Imagen mejorada mediante Red neuronal', im_RGB8)
 
 
 #%% Errores
 
-imagenes= [im_RGB, im_RGB3, im_RGB4 , im_RGB5, im_RGB7, im_RGB8]
+imagenes= [im_RGB*255, im_RGB3*255, im_RGB4*255 , im_RGB5*255, im_RGB7*255, im_RGB8*255]
 errores = fun.Error_de_reproduccion(imagenes, mascaras, color_check)
 errores_media = np.mean(errores,axis=1)
 
+
+im_Lab = fun.sRGB2Lab(im_RGB)
+im_Lab_Linear = fun.sRGB2Lab(im_RGB3)
+im_Lab_Polynomial = fun.sRGB2Lab(im_RGB7)
+
+color_check_lab=fun.sRGB2Lab(color_check)
+imagenes= [im_Lab, im_Lab_Linear,im_Lab_Polynomial]#, im_RGB4 , im_RGB5, im_RGB7, im_RGB8]
+errores_Lab = fun.Error_de_reproduccion(imagenes, mascaras, color_check_lab)
+errores_media_Lab = np.mean(errores_Lab,axis=1)

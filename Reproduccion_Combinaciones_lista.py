@@ -7,26 +7,14 @@ Created on Tue Dec  7 12:41:49 2021
 
 
 import numpy as np
-from os import system
 import os
 import funciones_reproduccion_color as fun
 import matplotlib.pyplot as plt
-import pickle
 import pandas as pd
 
-def graficas_error(min_error,nombre):
-    plt.figure(figsize=(4,3))
-    plt.plot(range(1,13),np.array(min_error),color='black')
-    plt.xlabel('Cantidad Im')
-    plt.savefig('Resultados/Imagenes/Grafica_error_'+nombre+'.pdf', format='pdf')
-    plt.show()
-    
-    fichero = open('Resultados/Variables/combinaciones_'+nombre+'.pickle','wb')
-    pickle.dump(mejores_comb,fichero)
-    fichero.close()
 
 #%% borrar todo lo cargado anteriormente
-system("cls")
+#system("cls")
 
 #%% barra de colores para mostrar grafico
 color_check = np.array([[116,81,67], [199,147,129], [91,122,156], [90,108,64], [130,128,176], [92,190,172],
@@ -39,7 +27,6 @@ color_check = np.array([[116,81,67], [199,147,129], [91,122,156], [90,108,64], [
 #%% busqueda de los archivos en las carpetas correspondientes
 
 carpeta1 = 'informacion/patron'
-carpeta1 = 'D:\Documentos\Articulo_Programas_Reproduccion_Color\Informacion\patron'
 carpeta2 = 'informacion/mascaras'
 lista1 = os.listdir(carpeta1)
 lista2 = os.listdir(carpeta2)
@@ -67,7 +54,7 @@ writer = pd.ExcelWriter('Resultados/Variables/errores_combinaciones.xlsx')
 
 for i in range(1,13):
     
-    lista = fun.combinaciones_lista_errores(imagenes_patron, mascaras, color_check,i,type_error=type_error)
+    lista = fun.combinaciones_lista_errores(imagenes_patron, mascaras, fun.sRGB2Lab(color_check),i,type_error=type_error,OutColorSpace="Lab")
     indices = np.argsort(np.array(lista[:,-1]))
     lista_ordenada = lista[indices]
     plt.plot(range(len(lista)),lista_ordenada[:,-1])

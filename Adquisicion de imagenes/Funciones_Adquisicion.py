@@ -8,15 +8,13 @@ Created on Thu Mar 24 23:42:16 2022
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-import os
 import subprocess
-import platform
 
-
+# Esta funcion busca los puertos serial en uso. En caso de conocer el puerto serial se puede cambiar el parametro port='Nombre_del_puerto'
 def Serial_Port_Select(port=0):
     
-    if port!=1:
-        return port
+    if port!=0:
+        return port  #retorna el puerto en caso de que sea conocido 
     
     x = str(subprocess.check_output('python -m serial.tools.list_ports',shell=True),'UTF-8')
     lista = []
@@ -55,9 +53,13 @@ def Serial_Port_Select(port=0):
                 print("Valor erroneo ingrese el numero correspondiene al puerto")
                 
         return lista[sel-1]
-        
-nombre = Serial_Port_Select()
 
-print(nombre)
+
+
+        
+if __name__=='__main__':
+    nombre = Serial_Port_Select()
+
+    print(nombre)
 
 

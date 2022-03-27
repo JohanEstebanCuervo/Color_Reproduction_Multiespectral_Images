@@ -48,9 +48,10 @@ for nombre in lista:
         
         
         file.write('\\begin{table}[H]\n')
+        file.write('  \caption{Euclidean distance of each patch for '+nombre_archivo[-2:]+' images }\n')
         file.write('  \\begin{center}\n')
-        file.write('  \\resizebox{10cm}{!} {\n')
-        file.write('    \\begin{tabular}{|l |l |l |l |l |l |l |l |l |}\hline\n')
+        file.write('    \\begin{tabularx}{\\textwidth}{r c c c c c c c c}\n')
+        file.write('    \\toprule\n')
         
         num_errores= np.shape(errores)[0]
         nombres = ['Reproduction', 'Linear', 'Compound','Logarithm','Polynomial','Neural Network']
@@ -62,15 +63,15 @@ for nombre in lista:
             for columna in range(9):
                 if(fila%(num_errores+1)==0):
                     if(columna==0):
-                        file.write(' ')
+                        file.write('\\textbf{Patch Number}')
                     else:
-                        file.write(' &'+str(numero_parche))
+                        file.write(' & \\textbf{'+str(numero_parche)+'}')
                         numero_parche+=1
                 
                 else:
                     if(columna==0):
                         ind=fila%(num_errores+1)-1
-                        file.write(nombres[ind])
+                        file.write('\\textbf{'+nombres[ind]+'}')
                     else:
                         ind1= fila%(num_errores+1)-1
                         ind2= int(fila/(num_errores+1))*8+columna-1
@@ -82,14 +83,13 @@ for nombre in lista:
                             file.write(' &'+str(errores[ind1,ind2]))
                         
             if(fila%(num_errores+1)==0 or fila%(num_errores+1)==6):
-                file.write('\\\ \hline \n')
+                file.write('\\\ \midrule \n')
             
             else:
                 file.write('\\\ \n')
         
-        file.write('    \end{tabular}\n')
-        file.write('  }\n')
-        file.write('  \caption{Euclidean distance of each patch for '+nombre_archivo[-2:]+' images }\n')
+        file.write('    \\bottomrule\n')
+        file.write('    \end{tabularx}\n')
         file.write('  \end{center}\n')
         file.write('\end{table}\n')
         file.close()
@@ -100,10 +100,10 @@ for nombre in lista:
 
         file = open('Resultados/Formulas_Latex/'+'Tabla_medias_'+nombre_archivo+'.tex','w')
         file.write('\\begin{table}[H]\n')
-        file.write('  \\begin{center}\n')
-        file.write('  \\resizebox{5cm}{!} {\n')
-        file.write('    \\begin{tabular}{l r r}\n')
-        file.write('    \multicolumn{2}{c}{\\textbf{Average error rate}} \\\ \hline \n')
+        file.write('  \caption{Average errors of the proposed methods for '+nombre_archivo[-2:]+' images }\n')
+        file.write('  \\newcolumntype{C}{>{\\centering\\arraybackslash}X}')
+        file.write('    \\begin{tabularx}{\\textwidth}{C C}\n')
+        file.write('    \\toprule\n')
         
         medias= np.mean(errores,axis=1).round(3)
         
@@ -112,11 +112,8 @@ for nombre in lista:
             file.write('\\textbf{'+nombres[fila]+'}')
             file.write(' & '+str(medias[fila])+'\\\ \n')
         
-        
-        file.write('    \end{tabular}\n')
-        file.write('  }\n')
-        file.write('  \caption{Average errors of the proposed methods for '+nombre_archivo[-2:]+' images }\n')
-        file.write('  \end{center}\n')
+        file.write('    \\bottomrule\n')
+        file.write('    \end{tabularx}\n')
         file.write('\end{table}\n')
         file.close()
          
@@ -124,17 +121,17 @@ for nombre in lista:
         plt.figure(figsize=(12,8))
         for i in range(num_errores):
             plt.plot(range(1,25),errores[i])
-        plt.xlabel('patch number')
-        plt.ylabel('$\Delta$E')
-        plt.legend(nombres)
+        plt.xlabel('patch number',fontsize=20)
+        plt.ylabel('$\Delta$E',fontsize=20)
+        plt.legend(nombres,fontsize=12)
         plt.savefig('Resultados/Imagenes/grafica_error_Nim'+nombre_archivo[-2:]+'.pdf', format='pdf')
         plt.show()
         
         plt.figure(figsize=(12,8))
         for i in [0,num_errores-2,num_errores-1]:
             plt.plot(range(1,25),errores[i])
-        plt.xlabel('patch number')
-        plt.ylabel('$\Delta$E')
-        plt.legend(nombres)
+        plt.xlabel('patch number',fontsize=20)
+        plt.ylabel('$\Delta$E',fontsize=20)
+        plt.legend(nombres,fontsize=15)
         plt.savefig('Resultados/Imagenes/grafica_error2_Nim'+nombre_archivo[-2:]+'.pdf', format='pdf')
         plt.show()

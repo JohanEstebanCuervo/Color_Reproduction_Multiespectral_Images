@@ -1,16 +1,13 @@
 \begin{table}[H]
-  \begin{center}
-  \resizebox{5cm}{!} {
-    \begin{tabular}{l r r}
-    \multicolumn{2}{c}{\textbf{Average error rate}} \\ \hline 
+  \caption{Average errors of the proposed methods for 12 images }
+  \newcolumntype{C}{>{\centering\arraybackslash}X}    \begin{tabularx}{\textwidth}{C C}
+    \toprule
         \textbf{Reproduction} & 23.543\\ 
         \textbf{Linear} & 8.233\\ 
         \textbf{Compound} & 12.155\\ 
         \textbf{Logarithm} & 10.368\\ 
         \textbf{Polynomial} & 5.461\\ 
         \textbf{Neural Network} & 3.908\\ 
-    \end{tabular}
-  }
-  \caption{Average errors of the proposed methods for 12 images }
-  \end{center}
+    \bottomrule
+    \end{tabularx}
 \end{table}

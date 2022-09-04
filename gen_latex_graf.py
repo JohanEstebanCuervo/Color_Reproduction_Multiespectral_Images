@@ -123,7 +123,7 @@ def generate_table_sep(folder, nombre):
         "Neural Network",
     ]
     for count, metodo in enumerate(nombres_metodos):
-        nombres = [metodo, 'Porcentaje E']
+        nombres = [metodo, r'\textbf{\% $\Delta$E}']
         errores = errores_metodos[count,:].reshape((1,-1))
         por_error =  errores / np.sqrt(3* 255**2) * 100
         for i, error in enumerate(por_error[0]):
@@ -293,9 +293,9 @@ def generate_graphics_sep(folder, nombre):
         plt.plot(range(1, 25), np.ones(np.size(errores[count]))*maxi, color='black', linestyle = '--')
         plt.plot(range(1, 25), np.ones(np.size(errores[count]))*mini, color='black', linestyle = '--')
 
-        plt.xlabel("patch number", fontsize=20)
-        plt.ylabel("$\Delta$E", fontsize=20)
-        plt.legend((nombres_metodos[0], metodo), fontsize=12)
+        plt.xlabel("patch number", fontsize=24)
+        plt.ylabel("$\Delta$E", fontsize=24)
+        plt.legend((nombres_metodos[0], metodo), fontsize=20)
         plt.savefig(
             "Resultados/Imagenes/grafica_error_Nim" + nombre_archivo + ".pdf",
             format="pdf",

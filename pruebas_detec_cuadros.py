@@ -20,11 +20,11 @@ import funciones_reproduccion_color as func
 import funciones_deteccion_cuadros as dtec_
 
 
-carpeta1 = 'Carta Color\Carta20'
-#carpeta1 = 'imgs\Patron0'
-#carpeta1 = 'Carta Color\Carta153'
-carpeta2 = 'imgs\mascaras'
+carpeta1 = "Carta Color\Carta20"
+# carpeta1 = 'imgs\Patron0'
+# carpeta1 = 'Carta Color\Carta153'
+carpeta2 = "imgs\mascaras"
 lista1 = os.listdir(carpeta1)
 lista2 = os.listdir(carpeta2)
 
-prueba= dtec_.mascaras(carpeta1,lista1[:13])
+prueba = dtec_.mascaras(carpeta1, lista1[:13])

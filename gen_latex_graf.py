@@ -215,20 +215,24 @@ def generate_median(folder, nombre):
     )
     file.write("\\begin{table}[H]\n")
     file.write(
-        "  \caption{Average errors of the proposed methods for "
-        + nombre_archivo[-2:]
-        + " images }\n"
+        r"  \caption{"
+        r"\label{tab:Average errors of the proposed methods}" +
+        r"Average errors deltaE and \% of the proposed methods using "  +
+        f"{nombre_archivo[-2:]} wavelengths{'}'}\n"
     )
     file.write("  \\newcolumntype{C}{>{\\centering\\arraybackslash}X}")
-    file.write("    \\begin{tabularx}{\\textwidth}{C C}\n")
+    file.write("    \\begin{tabularx}{\\textwidth}{C C C}\n")
     file.write("    \\toprule\n")
+    file.write(r'      \textbf{method} & \textbf{$\Delta E$} & \textbf{\% $\Delta E$} \\ \midrule')
+    file.write('\n')
 
     medias = np.mean(errores, axis=1).round(3)
-
+    por_error =  (medias / np.sqrt(3* 255**2) * 100).round(3)
     for fila in range(num_errores):
-        file.write("        ")
+        file.write("      ")
         file.write("\\textbf{" + nombres[fila] + "}")
-        file.write(" & " + str(medias[fila]) + "\\\ \n")
+        file.write(" & " + str(medias[fila]))
+        file.write(" & " + str(por_error[fila]) + "\\\ \n")
 
     file.write("    \\bottomrule\n")
     file.write("    \end{tabularx}\n")

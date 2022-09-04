@@ -39,8 +39,10 @@ class EventType:
     'Enum' for choosing whether to register a event specifically for exposure end events
     or universally for all events.
     """
+
     GENERIC = 0
     SPECIFIC = 1
+
 
 CHOSEN_EVENT = EventType.GENERIC  # change me!
 NUM_IMAGES = 10  # number of images to acquire
@@ -56,6 +58,7 @@ class DeviceEventHandler(PySpin.DeviceEventHandler):
     constructor, destructor, properties, and body of OnDeviceEvent() - are
     particular to the example.
     """
+
     def __init__(self, eventname):
         """
         This constructor registers an event name to be used on device events.
@@ -82,12 +85,13 @@ class DeviceEventHandler(PySpin.DeviceEventHandler):
             self.count += 1
 
             # Print information on specified device event
-            print('\tDevice event %s with ID %i number %i...' % (eventname,
-                                                               self.GetDeviceEventId(),
-                                                               self.count))
+            print(
+                "\tDevice event %s with ID %i number %i..."
+                % (eventname, self.GetDeviceEventId(), self.count)
+            )
         else:
             # Print no information on non-specified event
-            print('\tDevice event occurred; not %s; ignoring...' % self.event_name)
+            print("\tDevice event occurred; not %s; ignoring..." % self.event_name)
 
 
 def configure_device_events(nodemap, cam):
@@ -104,11 +108,11 @@ def configure_device_events(nodemap, cam):
         device_event_handler is the event handler
     :rtype: (bool, DeviceEventHandler)
     """
-    print('\n*** CONFIGURING DEVICE EVENTS ***\n')
+    print("\n*** CONFIGURING DEVICE EVENTS ***\n")
 
     try:
         result = True
-        
+
         #  Retrieve device event selector
         #
         #  *** NOTES ***
@@ -121,13 +125,15 @@ def configure_device_events(nodemap, cam):
         #  all device events are enabled while the device event handler deals with
         #  ensuring that only exposure end events are considered. A more standard
         #  use-case might be to enable only the events of interest.
-        node_event_selector = PySpin.CEnumerationPtr(nodemap.GetNode('EventSelector'))
-        if not PySpin.IsAvailable(node_event_selector) or not PySpin.IsReadable(node_event_selector):
-            print('Unable to retrieve event selector entries. Aborting...')
+        node_event_selector = PySpin.CEnumerationPtr(nodemap.GetNode("EventSelector"))
+        if not PySpin.IsAvailable(node_event_selector) or not PySpin.IsReadable(
+            node_event_selector
+        ):
+            print("Unable to retrieve event selector entries. Aborting...")
             return False
 
         entries = node_event_selector.GetEntries()
-        print('Enabling event selector entries...')
+        print("Enabling event selector entries...")
 
         # Enable device events
         #
@@ -149,16 +155,24 @@ def configure_device_events(nodemap, cam):
             node_event_selector.SetIntValue(node_entry.GetValue())
 
             # Retrieve event notification node (an enumeration node)
-            node_event_notification = PySpin.CEnumerationPtr(nodemap.GetNode('EventNotification'))
-            if not PySpin.IsAvailable(node_event_notification) or not PySpin.IsWritable(node_event_notification):
+            node_event_notification = PySpin.CEnumerationPtr(
+                nodemap.GetNode("EventNotification")
+            )
+            if not PySpin.IsAvailable(node_event_notification) or not PySpin.IsWritable(
+                node_event_notification
+            ):
 
                 # Skip if node fails
                 result = False
                 continue
 
             # Retrieve entry node to enable device event
-            node_event_notification_on = PySpin.CEnumEntryPtr(node_event_notification.GetEntryByName('On'))
-            if not PySpin.IsAvailable(node_event_notification_on) or not PySpin.IsReadable(node_event_notification_on):
+            node_event_notification_on = PySpin.CEnumEntryPtr(
+                node_event_notification.GetEntryByName("On")
+            )
+            if not PySpin.IsAvailable(
+                node_event_notification_on
+            ) or not PySpin.IsReadable(node_event_notification_on):
 
                 # Skip if node fails
                 result = False
@@ -166,7 +180,7 @@ def configure_device_events(nodemap, cam):
 
             node_event_notification.SetIntValue(node_event_notification_on.GetValue())
 
-            print('\t%s: enabled...' % node_entry.GetDisplayName())
+            print("\t%s: enabled..." % node_entry.GetDisplayName())
 
         # Create device event handler
         #
@@ -175,7 +189,7 @@ def configure_device_events(nodemap, cam):
         # events are registered generically, all event types will trigger a
         # device event; on the other hand, if an event handler is registered
         # specifically, only that event will trigger an event.
-        device_event_handler = DeviceEventHandler('EventExposureEnd')
+        device_event_handler = DeviceEventHandler("EventExposureEnd")
 
         # Register device event handler
         #
@@ -194,18 +208,20 @@ def configure_device_events(nodemap, cam):
             # Device event handlers registered generally will be triggered by any device events.
             cam.RegisterEventHandler(device_event_handler)
 
-            print('Device event handler registered generally...')
+            print("Device event handler registered generally...")
 
         elif CHOSEN_EVENT == EventType.SPECIFIC:
 
             # Device event handlers registered to a specified event will only
             # be triggered by the type of event is it registered to.
-            cam.RegisterEventHandler(device_event_handler, 'EventExposureEnd')
+            cam.RegisterEventHandler(device_event_handler, "EventExposureEnd")
 
-            print('Device event handler registered specifically to EventExposureEnd events...')
+            print(
+                "Device event handler registered specifically to EventExposureEnd events..."
+            )
 
     except PySpin.SpinnakerException as ex:
-        print('Error: %s' % ex)
+        print("Error: %s" % ex)
         result = False
 
     return result, device_event_handler
@@ -232,10 +248,10 @@ def reset_device_events(cam, device_event_handler):
         # they are registered to.
         cam.UnregisterEventHandler(device_event_handler)
 
-        print('Device event handler unregistered...\n')
+        print("Device event handler unregistered...\n")
 
     except PySpin.SpinnakerException as ex:
-        print('Error: %s' % ex)
+        print("Error: %s" % ex)
         result = False
 
     return result
@@ -243,33 +259,44 @@ def reset_device_events(cam, device_event_handler):
 
 def print_device_info(nodemap):
     """
-     This function prints the device information of the camera from the transport
-     layer; please see NodeMapInfo example for more in-depth comments on printing
-     device information from the nodemap.
+    This function prints the device information of the camera from the transport
+    layer; please see NodeMapInfo example for more in-depth comments on printing
+    device information from the nodemap.
 
-     :param nodemap: Transport layer device nodemap.
-     :type nodemap: INodeMap
-     :return: True if successful, False otherwise.
-     :rtype: bool
+    :param nodemap: Transport layer device nodemap.
+    :type nodemap: INodeMap
+    :return: True if successful, False otherwise.
+    :rtype: bool
     """
-    print('\n*** DEVICE INFORMATION ***\n')
+    print("\n*** DEVICE INFORMATION ***\n")
 
     try:
         result = True
-        node_device_information = PySpin.CCategoryPtr(nodemap.GetNode('DeviceInformation'))
+        node_device_information = PySpin.CCategoryPtr(
+            nodemap.GetNode("DeviceInformation")
+        )
 
-        if PySpin.IsAvailable(node_device_information) and PySpin.IsReadable(node_device_information):
+        if PySpin.IsAvailable(node_device_information) and PySpin.IsReadable(
+            node_device_information
+        ):
             features = node_device_information.GetFeatures()
             for feature in features:
                 node_feature = PySpin.CValuePtr(feature)
-                print('%s: %s' % (node_feature.GetName(),
-                                  node_feature.ToString() if PySpin.IsReadable(node_feature) else 'Node not readable'))
+                print(
+                    "%s: %s"
+                    % (
+                        node_feature.GetName(),
+                        node_feature.ToString()
+                        if PySpin.IsReadable(node_feature)
+                        else "Node not readable",
+                    )
+                )
 
         else:
-            print('Device control information not available.')
+            print("Device control information not available.")
 
     except PySpin.SpinnakerException as ex:
-        print('Error: %s' % ex.message)
+        print("Error: %s" % ex.message)
         return False
 
     return result
@@ -289,39 +316,54 @@ def acquire_images(cam, nodemap, nodemap_tldevice):
     :return: True if successful, False otherwise.
     :rtype: bool
     """
-    print('\n*** IMAGE ACQUISITION ***\n')
+    print("\n*** IMAGE ACQUISITION ***\n")
     try:
         result = True
 
         # Set acquisition mode to continuous
-        node_acquisition_mode = PySpin.CEnumerationPtr(nodemap.GetNode('AcquisitionMode'))
-        if not PySpin.IsAvailable(node_acquisition_mode) or not PySpin.IsWritable(node_acquisition_mode):
-            print('Unable to set acquisition mode to continuous (enum retrieval). Aborting...\n')
+        node_acquisition_mode = PySpin.CEnumerationPtr(
+            nodemap.GetNode("AcquisitionMode")
+        )
+        if not PySpin.IsAvailable(node_acquisition_mode) or not PySpin.IsWritable(
+            node_acquisition_mode
+        ):
+            print(
+                "Unable to set acquisition mode to continuous (enum retrieval). Aborting...\n"
+            )
             return False
 
         # Retrieve entry node from enumeration node
-        node_acquisition_mode_continuous = node_acquisition_mode.GetEntryByName('Continuous')
-        if not PySpin.IsAvailable(node_acquisition_mode_continuous) \
-                or not PySpin.IsReadable(node_acquisition_mode_continuous):
-            print('Unable to set acquisition mode to continuous (entry retrieval). Aborting...\n')
+        node_acquisition_mode_continuous = node_acquisition_mode.GetEntryByName(
+            "Continuous"
+        )
+        if not PySpin.IsAvailable(
+            node_acquisition_mode_continuous
+        ) or not PySpin.IsReadable(node_acquisition_mode_continuous):
+            print(
+                "Unable to set acquisition mode to continuous (entry retrieval). Aborting...\n"
+            )
             return False
 
         acquisition_mode_continuous = node_acquisition_mode_continuous.GetValue()
 
         node_acquisition_mode.SetIntValue(acquisition_mode_continuous)
 
-        print('Acquisition mode set to continuous...')
+        print("Acquisition mode set to continuous...")
 
         #  Begin acquiring images
         cam.BeginAcquisition()
 
-        print('Acquiring images...')
+        print("Acquiring images...")
 
         # Retrieve device serial number for filename
-        node_device_serial_number = PySpin.CStringPtr(nodemap_tldevice.GetNode('DeviceSerialNumber'))
-        if PySpin.IsAvailable(node_device_serial_number) and PySpin.IsReadable(node_device_serial_number):
+        node_device_serial_number = PySpin.CStringPtr(
+            nodemap_tldevice.GetNode("DeviceSerialNumber")
+        )
+        if PySpin.IsAvailable(node_device_serial_number) and PySpin.IsReadable(
+            node_device_serial_number
+        ):
             device_serial_number = node_device_serial_number.GetValue()
-            print('Device serial number retrieved as %s...' % device_serial_number)
+            print("Device serial number retrieved as %s..." % device_serial_number)
 
         # Retrieve, convert, and save images
         for i in range(NUM_IMAGES):
@@ -330,39 +372,46 @@ def acquire_images(cam, nodemap, nodemap_tldevice):
                 image_result = cam.GetNextImage(1000)
 
                 if image_result.IsIncomplete():
-                    print('Image incomplete with image status %s...' % image_result.GetImageStatus())
+                    print(
+                        "Image incomplete with image status %s..."
+                        % image_result.GetImageStatus()
+                    )
 
                 else:
 
                     # Print image information
                     width = image_result.GetWidth()
                     height = image_result.GetHeight()
-                    print('Grabbed Image %i, width = %i, height = %i' % (i, width, height))
+                    print(
+                        "Grabbed Image %i, width = %i, height = %i" % (i, width, height)
+                    )
 
                     # Convert to mono8
-                    image_converted = image_result.Convert(PySpin.PixelFormat_Mono8, PySpin.HQ_LINEAR)
+                    image_converted = image_result.Convert(
+                        PySpin.PixelFormat_Mono8, PySpin.HQ_LINEAR
+                    )
 
                     if device_serial_number:
-                        filename = 'DeviceEvents-%s-%i.jpg' % (device_serial_number, i)
+                        filename = "DeviceEvents-%s-%i.jpg" % (device_serial_number, i)
                     else:
-                        filename = 'DeviceEvents-%i.jpg' % i
+                        filename = "DeviceEvents-%i.jpg" % i
 
                     # Save image
                     image_converted.Save(filename)
-                    print('Image saved at %s' % filename)
+                    print("Image saved at %s" % filename)
 
                 # Release image
                 image_result.Release()
-                print('')
+                print("")
 
             except PySpin.SpinnakerException as ex:
-                print('Error: %s' % ex)
+                print("Error: %s" % ex)
                 result = False
 
         cam.EndAcquisition()
 
     except PySpin.SpinnakerException as ex:
-        print('Error: %s' % ex)
+        print("Error: %s" % ex)
         result = False
 
     return result
@@ -407,7 +456,7 @@ def run_single_camera(cam):
         cam.DeInit()
 
     except PySpin.SpinnakerException as ex:
-        print('Error: %s' % ex.message)
+        print("Error: %s" % ex.message)
         result = False
 
     return result
@@ -426,10 +475,10 @@ def main():
     # we must ensure that we have permission to write to this folder.
     # If we do not have permission, fail right away.
     try:
-        test_file = open('test.txt', 'w+')
+        test_file = open("test.txt", "w+")
     except IOError:
-        print('Unable to write to current directory. Please check permissions.')
-        input('Press Enter to exit...')
+        print("Unable to write to current directory. Please check permissions.")
+        input("Press Enter to exit...")
         return False
 
     test_file.close()
@@ -442,14 +491,17 @@ def main():
 
     # Get current library version
     version = system.GetLibraryVersion()
-    print('Library version: %d.%d.%d.%d' % (version.major, version.minor, version.type, version.build))
+    print(
+        "Library version: %d.%d.%d.%d"
+        % (version.major, version.minor, version.type, version.build)
+    )
 
     # Retrieve list of cameras from the system
     cam_list = system.GetCameras()
 
     num_cameras = cam_list.GetSize()
 
-    print('Number of cameras detected: %d' % num_cameras)
+    print("Number of cameras detected: %d" % num_cameras)
 
     # Finish if there are no cameras
     if num_cameras == 0:
@@ -460,17 +512,17 @@ def main():
         # Release system instance
         system.ReleaseInstance()
 
-        print('Not enough cameras!')
-        input('Done! Press Enter to exit...')
+        print("Not enough cameras!")
+        input("Done! Press Enter to exit...")
         return False
 
     # Run example on each camera
     for i, cam in enumerate(cam_list):
 
-        print('Running example for camera %d...' % i)
+        print("Running example for camera %d..." % i)
 
         result &= run_single_camera(cam)
-        print('Camera %d example complete... \n' % i)
+        print("Camera %d example complete... \n" % i)
 
     # Release reference to camera
     # NOTE: Unlike the C++ examples, we cannot rely on pointer objects being automatically
@@ -484,10 +536,11 @@ def main():
     # Release system instance
     system.ReleaseInstance()
 
-    input('Done! Press Enter to exit...')
+    input("Done! Press Enter to exit...")
     return result
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     if main():
         sys.exit(0)
     else:

@@ -57,15 +57,15 @@ class LoggingEventHandler(PySpin.LoggingEventHandler):
         :type logging_event_data: LoggingEventData
         :rtype: None
         """
-        print('--------Log Event Received----------')
-        print('Category: %s' % logging_event_data.GetCategoryName())
-        print('Priority Value: %s' % logging_event_data.GetPriority())
-        print('Priority Name: %s' % logging_event_data.GetPriorityName())
-        print('Timestamp: %s' % logging_event_data.GetTimestamp())
-        print('NDC: %s' % logging_event_data.GetNDC())
-        print('Thread: %s' % logging_event_data.GetThreadName())
-        print('Message: %s' % logging_event_data.GetLogMessage())
-        print('------------------------------------\n')
+        print("--------Log Event Received----------")
+        print("Category: %s" % logging_event_data.GetCategoryName())
+        print("Priority Value: %s" % logging_event_data.GetPriority())
+        print("Priority Name: %s" % logging_event_data.GetPriorityName())
+        print("Timestamp: %s" % logging_event_data.GetTimestamp())
+        print("NDC: %s" % logging_event_data.GetNDC())
+        print("Thread: %s" % logging_event_data.GetThreadName())
+        print("Message: %s" % logging_event_data.GetLogMessage())
+        print("------------------------------------\n")
 
 
 def main():
@@ -83,7 +83,10 @@ def main():
 
     # Get current library version
     version = system.GetLibraryVersion()
-    print('Library version: %d.%d.%d.%d' % (version.major, version.minor, version.type, version.build))
+    print(
+        "Library version: %d.%d.%d.%d"
+        % (version.major, version.minor, version.type, version.build)
+    )
 
     # Create and register the logging event handler
     #
@@ -109,7 +112,7 @@ def main():
 
     num_cams = cam_list.GetSize()
 
-    print('Number of cameras detected: %i' % num_cams)
+    print("Number of cameras detected: %i" % num_cams)
 
     # Clear camera list before releasing system
     cam_list.Clear()
@@ -123,8 +126,8 @@ def main():
     # Release system instance
     system.ReleaseInstance()
 
-    input('Done! Press Enter to exit...')
+    input("Done! Press Enter to exit...")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

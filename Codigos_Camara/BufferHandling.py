@@ -41,6 +41,7 @@ NUM_TRIGGERS = 6
 # Total number of loops
 NUM_LOOPS = 9
 
+
 def configure_trigger(nodemap):
     """
     This function configures the camera to use a trigger. First, trigger mode is
@@ -55,54 +56,67 @@ def configure_trigger(nodemap):
     """
     try:
         result = True
-        print('\n*** CONFIGURING TRIGGER ***\n')
+        print("\n*** CONFIGURING TRIGGER ***\n")
 
         # Ensure trigger mode off
         #
         # *** NOTES ***
         # The trigger must be disabled in order to configure the
         # trigger source.
-        trigger_mode = PySpin.CEnumerationPtr(nodemap.GetNode('TriggerMode'))
+        trigger_mode = PySpin.CEnumerationPtr(nodemap.GetNode("TriggerMode"))
         if not PySpin.IsAvailable(trigger_mode) or not PySpin.IsWritable(trigger_mode):
-            print('Unable to disable trigger mode (node retrieval). Aborting...\n')
+            print("Unable to disable trigger mode (node retrieval). Aborting...\n")
             return False
 
-        trigger_mode_off = PySpin.CEnumEntryPtr(trigger_mode.GetEntryByName('Off'))
-        if not PySpin.IsAvailable(trigger_mode_off) or not PySpin.IsReadable(trigger_mode_off):
-            print('Unable to disable trigger mode (enum entry retrieval). Aborting...\n')
+        trigger_mode_off = PySpin.CEnumEntryPtr(trigger_mode.GetEntryByName("Off"))
+        if not PySpin.IsAvailable(trigger_mode_off) or not PySpin.IsReadable(
+            trigger_mode_off
+        ):
+            print(
+                "Unable to disable trigger mode (enum entry retrieval). Aborting...\n"
+            )
             return False
 
         trigger_mode.SetIntValue(trigger_mode_off.GetValue())
-        print('Trigger mode disabled...')
+        print("Trigger mode disabled...")
 
         # Set trigger source to software
-        trigger_source = PySpin.CEnumerationPtr(nodemap.GetNode('TriggerSource'))
-        if not PySpin.IsAvailable(trigger_source) or not PySpin.IsWritable(trigger_source):
-            print('Unable to set trigger mode (node retrieval). Aborting...')
+        trigger_source = PySpin.CEnumerationPtr(nodemap.GetNode("TriggerSource"))
+        if not PySpin.IsAvailable(trigger_source) or not PySpin.IsWritable(
+            trigger_source
+        ):
+            print("Unable to set trigger mode (node retrieval). Aborting...")
             return False
 
-        trigger_source_software = PySpin.CEnumEntryPtr(trigger_source.GetEntryByName('Software'))
-        if not PySpin.IsAvailable(trigger_source_software) or not PySpin.IsReadable(trigger_source_software):
-            print('Unable to set trigger mode (enum entry retrieval). Aborting...')
+        trigger_source_software = PySpin.CEnumEntryPtr(
+            trigger_source.GetEntryByName("Software")
+        )
+        if not PySpin.IsAvailable(trigger_source_software) or not PySpin.IsReadable(
+            trigger_source_software
+        ):
+            print("Unable to set trigger mode (enum entry retrieval). Aborting...")
             return False
 
         trigger_source.SetIntValue(trigger_source_software.GetValue())
-        print('Trigger source set to software...')
+        print("Trigger source set to software...")
 
         # Turn trigger mode on
-        trigger_mode_on = PySpin.CEnumEntryPtr(trigger_mode.GetEntryByName('On'))
-        if not PySpin.IsAvailable(trigger_mode_on) or not PySpin.IsReadable(trigger_mode_on):
-            print('Unable to enable trigger mode (enum entry retrieval). Aborting...\n')
+        trigger_mode_on = PySpin.CEnumEntryPtr(trigger_mode.GetEntryByName("On"))
+        if not PySpin.IsAvailable(trigger_mode_on) or not PySpin.IsReadable(
+            trigger_mode_on
+        ):
+            print("Unable to enable trigger mode (enum entry retrieval). Aborting...\n")
             return False
 
         trigger_mode.SetIntValue(trigger_mode_on.GetValue())
-        print('Trigger mode turned back on...')
+        print("Trigger mode turned back on...")
 
     except PySpin.SpinnakerException as ex:
-        print('Error: %s' % ex)
+        print("Error: %s" % ex)
         result = False
 
     return result
+
 
 def grab_next_image_by_trigger(nodemap):
     """
@@ -122,18 +136,23 @@ def grab_next_image_by_trigger(nodemap):
         result = True
 
         # Execute software trigger
-        software_trigger_command = PySpin.CCommandPtr(nodemap.GetNode('TriggerSoftware'))
-        if not PySpin.IsAvailable(software_trigger_command) or not PySpin.IsWritable(software_trigger_command):
-            print('Unable to execute trigger. Aborting...\n')
+        software_trigger_command = PySpin.CCommandPtr(
+            nodemap.GetNode("TriggerSoftware")
+        )
+        if not PySpin.IsAvailable(software_trigger_command) or not PySpin.IsWritable(
+            software_trigger_command
+        ):
+            print("Unable to execute trigger. Aborting...\n")
             return False
 
         software_trigger_command.Execute()
 
     except PySpin.SpinnakerException as ex:
-        print('Error: %s' % ex)
+        print("Error: %s" % ex)
         result = False
 
     return result
+
 
 def reset_trigger(nodemap):
     """
@@ -152,24 +171,31 @@ def reset_trigger(nodemap):
         # *** NOTES ***
         # Once all images have been captured, turn trigger mode back off to
         # restore the camera to a clean state.
-        trigger_mode = PySpin.CEnumerationPtr(nodemap.GetNode('TriggerMode'))
+        trigger_mode = PySpin.CEnumerationPtr(nodemap.GetNode("TriggerMode"))
         if not PySpin.IsAvailable(trigger_mode) or not PySpin.IsWritable(trigger_mode):
-            print('Unable to disable trigger mode (node retrieval). Non-fatal error...\n')
+            print(
+                "Unable to disable trigger mode (node retrieval). Non-fatal error...\n"
+            )
             return False
 
-        trigger_mode_off = PySpin.CEnumEntryPtr(trigger_mode.GetEntryByName('Off'))
-        if not PySpin.IsAvailable(trigger_mode_off) or not PySpin.IsReadable(trigger_mode_off):
-            print('Unable to disable trigger mode (enum entry retrieval). Non-fatal error...\n')
+        trigger_mode_off = PySpin.CEnumEntryPtr(trigger_mode.GetEntryByName("Off"))
+        if not PySpin.IsAvailable(trigger_mode_off) or not PySpin.IsReadable(
+            trigger_mode_off
+        ):
+            print(
+                "Unable to disable trigger mode (enum entry retrieval). Non-fatal error...\n"
+            )
             return False
 
         trigger_mode.SetIntValue(trigger_mode_off.GetValue())
-        print('Trigger mode disabled...\n')
+        print("Trigger mode disabled...\n")
 
     except PySpin.SpinnakerException as ex:
-        print('Error: %s' % ex)
+        print("Error: %s" % ex)
         result = False
 
     return result
+
 
 def print_device_info(nodemap):
     """
@@ -184,25 +210,37 @@ def print_device_info(nodemap):
     """
     try:
         result = True
-        print('\n*** DEVICE INFORMATION ***\n')
+        print("\n*** DEVICE INFORMATION ***\n")
 
         # Retrieve and display Device Information
-        node_device_information = PySpin.CCategoryPtr(nodemap.GetNode('DeviceInformation'))
-        if PySpin.IsAvailable(node_device_information) and PySpin.IsReadable(node_device_information):
+        node_device_information = PySpin.CCategoryPtr(
+            nodemap.GetNode("DeviceInformation")
+        )
+        if PySpin.IsAvailable(node_device_information) and PySpin.IsReadable(
+            node_device_information
+        ):
             features = node_device_information.GetFeatures()
             for feature in features:
                 node_feature = PySpin.CValuePtr(feature)
-                print('%s: %s' % (node_feature.GetName(),
-                                  node_feature.ToString() if PySpin.IsReadable(node_feature) else 'Node not readable'))
+                print(
+                    "%s: %s"
+                    % (
+                        node_feature.GetName(),
+                        node_feature.ToString()
+                        if PySpin.IsReadable(node_feature)
+                        else "Node not readable",
+                    )
+                )
 
         else:
-            print('Device control information not available.')
+            print("Device control information not available.")
 
     except PySpin.SpinnakerException as ex:
-        print('Error: %s' % ex)
+        print("Error: %s" % ex)
         result = False
 
     return result
+
 
 def acquire_images(cam, nodemap, nodemap_tldevice):
     """
@@ -220,18 +258,29 @@ def acquire_images(cam, nodemap, nodemap_tldevice):
     """
     try:
         result = True
-        print('\n*** IMAGE ACQUISITION ***\n')
+        print("\n*** IMAGE ACQUISITION ***\n")
 
-        node_acquisition_mode = PySpin.CEnumerationPtr(nodemap.GetNode('AcquisitionMode'))
-        if not PySpin.IsAvailable(node_acquisition_mode) or not PySpin.IsWritable(node_acquisition_mode):
-            print('Unable to set acquisition mode to continuous (node retrieval). Aborting...')
+        node_acquisition_mode = PySpin.CEnumerationPtr(
+            nodemap.GetNode("AcquisitionMode")
+        )
+        if not PySpin.IsAvailable(node_acquisition_mode) or not PySpin.IsWritable(
+            node_acquisition_mode
+        ):
+            print(
+                "Unable to set acquisition mode to continuous (node retrieval). Aborting..."
+            )
             return False
 
         # Retrieve entry node from enumeration mode
-        node_acquisition_mode_continuous = node_acquisition_mode.GetEntryByName('Continuous')
-        if not PySpin.IsAvailable(node_acquisition_mode_continuous) or not PySpin.IsReadable(
-                node_acquisition_mode_continuous):
-            print('Unable to set acquisition mode to continuous (entry retrieval). Aborting...')
+        node_acquisition_mode_continuous = node_acquisition_mode.GetEntryByName(
+            "Continuous"
+        )
+        if not PySpin.IsAvailable(
+            node_acquisition_mode_continuous
+        ) or not PySpin.IsReadable(node_acquisition_mode_continuous):
+            print(
+                "Unable to set acquisition mode to continuous (entry retrieval). Aborting..."
+            )
             return False
 
         # Retrieve integer value from entry node
@@ -240,76 +289,115 @@ def acquire_images(cam, nodemap, nodemap_tldevice):
         # Set integer value from entry node as new value of enumeration node
         node_acquisition_mode.SetIntValue(acquisition_mode_continuous)
 
-        print('Acquisition mode set to continuous...')
+        print("Acquisition mode set to continuous...")
 
         # Retrieve device serial number for filename
-        device_serial_number = ''
-        node_device_serial_number = PySpin.CStringPtr(nodemap_tldevice.GetNode('DeviceSerialNumber'))
-        if PySpin.IsAvailable(node_device_serial_number) and PySpin.IsReadable(node_device_serial_number):
+        device_serial_number = ""
+        node_device_serial_number = PySpin.CStringPtr(
+            nodemap_tldevice.GetNode("DeviceSerialNumber")
+        )
+        if PySpin.IsAvailable(node_device_serial_number) and PySpin.IsReadable(
+            node_device_serial_number
+        ):
             device_serial_number = node_device_serial_number.GetValue()
-            print('Device serial number retrieved as %s...' % device_serial_number)
+            print("Device serial number retrieved as %s..." % device_serial_number)
 
         # Retrieve Stream Parameters device nodemap
         s_node_map = cam.GetTLStreamNodeMap()
 
         # Retrieve Buffer Handling Mode Information
-        handling_mode = PySpin.CEnumerationPtr(s_node_map.GetNode('StreamBufferHandlingMode'))
-        if not PySpin.IsAvailable(handling_mode) or not PySpin.IsWritable(handling_mode):
-            print('Unable to set Buffer Handling mode (node retrieval). Aborting...\n')
+        handling_mode = PySpin.CEnumerationPtr(
+            s_node_map.GetNode("StreamBufferHandlingMode")
+        )
+        if not PySpin.IsAvailable(handling_mode) or not PySpin.IsWritable(
+            handling_mode
+        ):
+            print("Unable to set Buffer Handling mode (node retrieval). Aborting...\n")
             return False
 
         handling_mode_entry = PySpin.CEnumEntryPtr(handling_mode.GetCurrentEntry())
-        if not PySpin.IsAvailable(handling_mode_entry) or not PySpin.IsReadable(handling_mode_entry):
-            print('Unable to set Buffer Handling mode (Entry retrieval). Aborting...\n')
+        if not PySpin.IsAvailable(handling_mode_entry) or not PySpin.IsReadable(
+            handling_mode_entry
+        ):
+            print("Unable to set Buffer Handling mode (Entry retrieval). Aborting...\n")
             return False
 
         # Set stream buffer Count Mode to manual
-        stream_buffer_count_mode = PySpin.CEnumerationPtr(s_node_map.GetNode('StreamBufferCountMode'))
-        if not PySpin.IsAvailable(stream_buffer_count_mode) or not PySpin.IsWritable(stream_buffer_count_mode):
-            print('Unable to set Buffer Count Mode (node retrieval). Aborting...\n')
+        stream_buffer_count_mode = PySpin.CEnumerationPtr(
+            s_node_map.GetNode("StreamBufferCountMode")
+        )
+        if not PySpin.IsAvailable(stream_buffer_count_mode) or not PySpin.IsWritable(
+            stream_buffer_count_mode
+        ):
+            print("Unable to set Buffer Count Mode (node retrieval). Aborting...\n")
             return False
 
-        stream_buffer_count_mode_manual = PySpin.CEnumEntryPtr(stream_buffer_count_mode.GetEntryByName('Manual'))
-        if not PySpin.IsAvailable(stream_buffer_count_mode_manual) or not PySpin.IsReadable(stream_buffer_count_mode_manual):
-            print('Unable to set Buffer Count Mode entry (Entry retrieval). Aborting...\n')
+        stream_buffer_count_mode_manual = PySpin.CEnumEntryPtr(
+            stream_buffer_count_mode.GetEntryByName("Manual")
+        )
+        if not PySpin.IsAvailable(
+            stream_buffer_count_mode_manual
+        ) or not PySpin.IsReadable(stream_buffer_count_mode_manual):
+            print(
+                "Unable to set Buffer Count Mode entry (Entry retrieval). Aborting...\n"
+            )
             return False
 
         stream_buffer_count_mode.SetIntValue(stream_buffer_count_mode_manual.GetValue())
-        print('Stream Buffer Count Mode set to manual...')
+        print("Stream Buffer Count Mode set to manual...")
 
         # Retrieve and modify Stream Buffer Count
-        buffer_count = PySpin.CIntegerPtr(s_node_map.GetNode('StreamBufferCountManual'))
+        buffer_count = PySpin.CIntegerPtr(s_node_map.GetNode("StreamBufferCountManual"))
         if not PySpin.IsAvailable(buffer_count) or not PySpin.IsWritable(buffer_count):
-            print('Unable to set Buffer Count (Integer node retrieval). Aborting...\n')
+            print("Unable to set Buffer Count (Integer node retrieval). Aborting...\n")
             return False
 
         # Display Buffer Info
-        print('\nDefault Buffer Handling Mode: %s' % handling_mode_entry.GetDisplayName())
-        print('Default Buffer Count: %d' % buffer_count.GetValue())
-        print('Maximum Buffer Count: %d' % buffer_count.GetMax())
+        print(
+            "\nDefault Buffer Handling Mode: %s" % handling_mode_entry.GetDisplayName()
+        )
+        print("Default Buffer Count: %d" % buffer_count.GetValue())
+        print("Maximum Buffer Count: %d" % buffer_count.GetMax())
 
         buffer_count.SetValue(NUM_BUFFERS)
 
-        print('Buffer count now set to: %d' % buffer_count.GetValue())
-        print('\nCamera will be triggered %d times in a row before %d images will be retrieved' % (NUM_TRIGGERS,(NUM_LOOPS-NUM_TRIGGERS)))
+        print("Buffer count now set to: %d" % buffer_count.GetValue())
+        print(
+            "\nCamera will be triggered %d times in a row before %d images will be retrieved"
+            % (NUM_TRIGGERS, (NUM_LOOPS - NUM_TRIGGERS))
+        )
 
-        for x in range (0, 4):
+        for x in range(0, 4):
             if x == 0:
-                handling_mode_entry = handling_mode.GetEntryByName('NewestFirst')
+                handling_mode_entry = handling_mode.GetEntryByName("NewestFirst")
                 handling_mode.SetIntValue(handling_mode_entry.GetValue())
-                print('\n\nBuffer Handling Mode has been set to %s' % handling_mode_entry.GetDisplayName())
+                print(
+                    "\n\nBuffer Handling Mode has been set to %s"
+                    % handling_mode_entry.GetDisplayName()
+                )
             elif x == 1:
-                handling_mode_entry = handling_mode.GetEntryByName('NewestOnly')
+                handling_mode_entry = handling_mode.GetEntryByName("NewestOnly")
                 handling_mode.SetIntValue(handling_mode_entry.GetValue())
-                print('\n\nBuffer Handling Mode has been set to %s' % handling_mode_entry.GetDisplayName())
+                print(
+                    "\n\nBuffer Handling Mode has been set to %s"
+                    % handling_mode_entry.GetDisplayName()
+                )
             elif x == 2:
-                handling_mode_entry = handling_mode.GetEntryByName('OldestFirst')
+                handling_mode_entry = handling_mode.GetEntryByName("OldestFirst")
                 handling_mode.SetIntValue(handling_mode_entry.GetValue())
-                print('\n\nBuffer Handling Mode has been set to %s' % handling_mode_entry.GetDisplayName())
+                print(
+                    "\n\nBuffer Handling Mode has been set to %s"
+                    % handling_mode_entry.GetDisplayName()
+                )
             elif x == 3:
-                handling_mode_entry = handling_mode.GetEntryByName('OldestFirstOverwrite')
+                handling_mode_entry = handling_mode.GetEntryByName(
+                    "OldestFirstOverwrite"
+                )
                 handling_mode.SetIntValue(handling_mode_entry.GetValue())
-                print('\n\nBuffer Handling Mode has been set to %s' % handling_mode_entry.GetDisplayName())
+                print(
+                    "\n\nBuffer Handling Mode has been set to %s"
+                    % handling_mode_entry.GetDisplayName()
+                )
 
             # Begin capturing images
             cam.BeginAcquisition()
@@ -320,31 +408,44 @@ def acquire_images(cam, nodemap, nodemap_tldevice):
 
             try:
                 # Software Trigger the camera then  save images
-                for loop_cnt in range (0, NUM_LOOPS):
+                for loop_cnt in range(0, NUM_LOOPS):
                     if loop_cnt < NUM_TRIGGERS:
                         # Retrieve the next image from the trigger
                         result &= grab_next_image_by_trigger(nodemap)
-                        print('\nCamera triggered. No image grabbed')
+                        print("\nCamera triggered. No image grabbed")
                     else:
-                        print('\nNo trigger. Grabbing image %d' %(loop_cnt-NUM_TRIGGERS))
+                        print(
+                            "\nNo trigger. Grabbing image %d"
+                            % (loop_cnt - NUM_TRIGGERS)
+                        )
                         result_image = cam.GetNextImage(500)
 
                         if result_image.IsIncomplete():
-                            print('Image incomplete with image status %s ...\n' % result_image.GetImageStatus())
+                            print(
+                                "Image incomplete with image status %s ...\n"
+                                % result_image.GetImageStatus()
+                            )
 
                     if loop_cnt >= NUM_TRIGGERS:
                         # Retrieve Frame ID
-                        print('Frame ID: %d' % result_image.GetFrameID())
+                        print("Frame ID: %d" % result_image.GetFrameID())
 
                         # Create a unique filename
                         if device_serial_number:
-                            filename = '%s-%s-%d.jpg' % (handling_mode_entry.GetSymbolic(),device_serial_number, (loop_cnt-NUM_TRIGGERS))
+                            filename = "%s-%s-%d.jpg" % (
+                                handling_mode_entry.GetSymbolic(),
+                                device_serial_number,
+                                (loop_cnt - NUM_TRIGGERS),
+                            )
                         else:
-                            filename = '%s-%d.jpg' % (handling_mode_entry.GetSymbolic(),(loop_cnt-NUM_TRIGGERS))
+                            filename = "%s-%d.jpg" % (
+                                handling_mode_entry.GetSymbolic(),
+                                (loop_cnt - NUM_TRIGGERS),
+                            )
 
                         # Save image
                         result_image.Save(filename)
-                        print('Image saved at %s' % filename)
+                        print("Image saved at %s" % filename)
 
                         # Release image
                         result_image.Release()
@@ -353,19 +454,22 @@ def acquire_images(cam, nodemap, nodemap_tldevice):
                     time.sleep(0.25)
 
             except PySpin.SpinnakerException as ex:
-                print('Error: %s' % ex)
-                if handling_mode_entry.GetSymbolic() == 'NewestOnly':
-                    print('Error should occur when grabbing image 1 with handling mode set to NewestOnly')
+                print("Error: %s" % ex)
+                if handling_mode_entry.GetSymbolic() == "NewestOnly":
+                    print(
+                        "Error should occur when grabbing image 1 with handling mode set to NewestOnly"
+                    )
                 result = False
 
             # End acquisition
             cam.EndAcquisition()
 
     except PySpin.SpinnakerException as ex:
-        print('Error: %s' % ex)
+        print("Error: %s" % ex)
         result = False
 
     return result
+
 
 def run_single_camera(cam):
     """
@@ -405,10 +509,11 @@ def run_single_camera(cam):
         cam.DeInit()
 
     except PySpin.SpinnakerException as ex:
-        print('Error: %s' % ex)
+        print("Error: %s" % ex)
         result = False
 
     return result
+
 
 def main():
     """
@@ -423,10 +528,10 @@ def main():
     # we must ensure that we have permission to write to this folder.
     # If we do not have permission, fail right away.
     try:
-        test_file = open('test.txt', 'w+')
+        test_file = open("test.txt", "w+")
     except IOError:
-        print('Unable to write to current directory. Please check permissions.')
-        input('Press Enter to exit...')
+        print("Unable to write to current directory. Please check permissions.")
+        input("Press Enter to exit...")
         return False
 
     test_file.close()
@@ -439,14 +544,17 @@ def main():
 
     # Get current library version
     version = system.GetLibraryVersion()
-    print('Library version: %d.%d.%d.%d' % (version.major, version.minor, version.type, version.build))
+    print(
+        "Library version: %d.%d.%d.%d"
+        % (version.major, version.minor, version.type, version.build)
+    )
 
     # Retrieve list of cameras from the system
     cam_list = system.GetCameras()
 
     num_cameras = cam_list.GetSize()
 
-    print('Number of cameras detected: %d' % num_cameras)
+    print("Number of cameras detected: %d" % num_cameras)
 
     # Finish if there are no cameras
     if num_cameras == 0:
@@ -456,16 +564,16 @@ def main():
         # Release system instance
         system.ReleaseInstance()
 
-        print('Not enough cameras!')
-        input('Done! Press Enter to exit...')
+        print("Not enough cameras!")
+        input("Done! Press Enter to exit...")
         return False
 
     # Run example on each camera
     for i, cam in enumerate(cam_list):
-        print('\n\nRunning example for camera %d...' % i)
+        print("\n\nRunning example for camera %d..." % i)
 
         result &= run_single_camera(cam)
-        print('Camera %d example complete... \n' % i)
+        print("Camera %d example complete... \n" % i)
 
         # Release reference to camera
         # NOTE: Unlike the C++ examples, we cannot rely on pointer objects being automatically
@@ -479,15 +587,12 @@ def main():
     # Release system instance
     system.ReleaseInstance()
 
-    input('Done! Press Enter to exit...')
+    input("Done! Press Enter to exit...")
     return result
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     if main():
         sys.exit(0)
     else:
         sys.exit(1)
-
-
-

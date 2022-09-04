@@ -30,9 +30,11 @@ import sys
 
 class AviType:
     """'Enum' to select AVI video type to be created and saved"""
+
     UNCOMPRESSED = 0
     MJPG = 1
     H264 = 2
+
 
 chosenAviType = AviType.UNCOMPRESSED  # change me!
 NUM_IMAGES = 10  # number of images to use in AVI file
@@ -51,18 +53,18 @@ def save_list_to_avi(nodemap, nodemap_tldevice, images):
     :return: True if successful, False otherwise.
     :rtype: bool
     """
-    print('*** CREATING VIDEO ***')
+    print("*** CREATING VIDEO ***")
 
     try:
         result = True
 
         # Retrieve device serial number for filename
-        device_serial_number = ''
-        node_serial = PySpin.CStringPtr(nodemap_tldevice.GetNode('DeviceSerialNumber'))
+        device_serial_number = ""
+        node_serial = PySpin.CStringPtr(nodemap_tldevice.GetNode("DeviceSerialNumber"))
 
         if PySpin.IsAvailable(node_serial) and PySpin.IsReadable(node_serial):
             device_serial_number = node_serial.GetValue()
-            print('Device serial number retrieved as %s...' % device_serial_number)
+            print("Device serial number retrieved as %s..." % device_serial_number)
 
         # Get the current frame rate; acquisition frame rate recorded in hertz
         #
@@ -71,15 +73,19 @@ def save_list_to_avi(nodemap, nodemap_tldevice, images):
         # have videos play in real-time, the acquisition frame rate can be
         # retrieved from the camera.
 
-        node_acquisition_framerate = PySpin.CFloatPtr(nodemap.GetNode('AcquisitionFrameRate'))
+        node_acquisition_framerate = PySpin.CFloatPtr(
+            nodemap.GetNode("AcquisitionFrameRate")
+        )
 
-        if not PySpin.IsAvailable(node_acquisition_framerate) and not PySpin.IsReadable(node_acquisition_framerate):
-            print('Unable to retrieve frame rate. Aborting...')
+        if not PySpin.IsAvailable(node_acquisition_framerate) and not PySpin.IsReadable(
+            node_acquisition_framerate
+        ):
+            print("Unable to retrieve frame rate. Aborting...")
             return False
 
         framerate_to_set = node_acquisition_framerate.GetValue()
 
-        print('Frame rate to be set to %d...' % framerate_to_set)
+        print("Frame rate to be set to %d..." % framerate_to_set)
 
         # Select option and open AVI filetype with unique filename
         #
@@ -103,20 +109,20 @@ def save_list_to_avi(nodemap, nodemap_tldevice, images):
         avi_recorder = PySpin.SpinVideo()
 
         if chosenAviType == AviType.UNCOMPRESSED:
-            avi_filename = 'SaveToAvi-Uncompressed-%s' % device_serial_number
+            avi_filename = "SaveToAvi-Uncompressed-%s" % device_serial_number
 
             option = PySpin.AVIOption()
             option.frameRate = framerate_to_set
 
         elif chosenAviType == AviType.MJPG:
-            avi_filename = 'SaveToAvi-MJPG-%s' % device_serial_number
+            avi_filename = "SaveToAvi-MJPG-%s" % device_serial_number
 
             option = PySpin.MJPGOption()
             option.frameRate = framerate_to_set
             option.quality = 75
 
         elif chosenAviType == AviType.H264:
-            avi_filename = 'SaveToAvi-H264-%s' % device_serial_number
+            avi_filename = "SaveToAvi-H264-%s" % device_serial_number
 
             option = PySpin.H264Option()
             option.frameRate = framerate_to_set
@@ -125,7 +131,7 @@ def save_list_to_avi(nodemap, nodemap_tldevice, images):
             option.width = images[0].GetWidth()
 
         else:
-            print('Error: Unknown AviType. Aborting...')
+            print("Error: Unknown AviType. Aborting...")
             return False
 
         avi_recorder.Open(avi_filename, option)
@@ -135,11 +141,13 @@ def save_list_to_avi(nodemap, nodemap_tldevice, images):
         # *** NOTES ***
         # Although the video file has been opened, images must be individually
         # appended in order to construct the video.
-        print('Appending %d images to AVI file: %s.avi...' % (len(images), avi_filename))
+        print(
+            "Appending %d images to AVI file: %s.avi..." % (len(images), avi_filename)
+        )
 
         for i in range(len(images)):
             avi_recorder.Append(images[i])
-            print('Appended image %d...' % i)
+            print("Appended image %d..." % i)
 
         # Close AVI file
         #
@@ -149,10 +157,10 @@ def save_list_to_avi(nodemap, nodemap_tldevice, images):
         # images can be added.
 
         avi_recorder.Close()
-        print('Video saved at %s.avi' % avi_filename)
+        print("Video saved at %s.avi" % avi_filename)
 
     except PySpin.SpinnakerException as ex:
-        print('Error: %s' % ex)
+        print("Error: %s" % ex)
         return False
 
     return result
@@ -169,24 +177,35 @@ def print_device_info(nodemap):
     :return: True if successful, False otherwise.
     :rtype: bool
     """
-    print('\n*** DEVICE INFORMATION ***\n')
+    print("\n*** DEVICE INFORMATION ***\n")
 
     try:
         result = True
-        node_device_information = PySpin.CCategoryPtr(nodemap.GetNode('DeviceInformation'))
+        node_device_information = PySpin.CCategoryPtr(
+            nodemap.GetNode("DeviceInformation")
+        )
 
-        if PySpin.IsAvailable(node_device_information) and PySpin.IsReadable(node_device_information):
+        if PySpin.IsAvailable(node_device_information) and PySpin.IsReadable(
+            node_device_information
+        ):
             features = node_device_information.GetFeatures()
             for feature in features:
                 node_feature = PySpin.CValuePtr(feature)
-                print('%s: %s' % (node_feature.GetName(),
-                                  node_feature.ToString() if PySpin.IsReadable(node_feature) else 'Node not readable'))
+                print(
+                    "%s: %s"
+                    % (
+                        node_feature.GetName(),
+                        node_feature.ToString()
+                        if PySpin.IsReadable(node_feature)
+                        else "Node not readable",
+                    )
+                )
 
         else:
-            print('Device control information not available.')
+            print("Device control information not available.")
 
     except PySpin.SpinnakerException as ex:
-        print('Error: %s' % ex)
+        print("Error: %s" % ex)
         return False
 
     return result
@@ -204,32 +223,44 @@ def acquire_images(cam, nodemap):
     :return: True if successful, False otherwise.
     :rtype: bool
     """
-    print('*** IMAGE ACQUISITION ***\n')
+    print("*** IMAGE ACQUISITION ***\n")
     try:
         result = True
 
         # Set acquisition mode to continuous
-        node_acquisition_mode = PySpin.CEnumerationPtr(nodemap.GetNode('AcquisitionMode'))
-        if not PySpin.IsAvailable(node_acquisition_mode) or not PySpin.IsWritable(node_acquisition_mode):
-            print('Unable to set acquisition mode to continuous (enum retrieval). Aborting...')
+        node_acquisition_mode = PySpin.CEnumerationPtr(
+            nodemap.GetNode("AcquisitionMode")
+        )
+        if not PySpin.IsAvailable(node_acquisition_mode) or not PySpin.IsWritable(
+            node_acquisition_mode
+        ):
+            print(
+                "Unable to set acquisition mode to continuous (enum retrieval). Aborting..."
+            )
             return False
 
         # Retrieve entry node from enumeration node
-        node_acquisition_mode_continuous = node_acquisition_mode.GetEntryByName('Continuous')
-        if not PySpin.IsAvailable(node_acquisition_mode_continuous) or not PySpin.IsReadable(node_acquisition_mode_continuous):
-            print('Unable to set acquisition mode to continuous (entry retrieval). Aborting...')
+        node_acquisition_mode_continuous = node_acquisition_mode.GetEntryByName(
+            "Continuous"
+        )
+        if not PySpin.IsAvailable(
+            node_acquisition_mode_continuous
+        ) or not PySpin.IsReadable(node_acquisition_mode_continuous):
+            print(
+                "Unable to set acquisition mode to continuous (entry retrieval). Aborting..."
+            )
             return False
 
         acquisition_mode_continuous = node_acquisition_mode_continuous.GetValue()
 
         node_acquisition_mode.SetIntValue(acquisition_mode_continuous)
 
-        print('Acquisition mode set to continuous...')
+        print("Acquisition mode set to continuous...")
 
         #  Begin acquiring images
         cam.BeginAcquisition()
 
-        print('Acquiring images...')
+        print("Acquiring images...")
 
         # Retrieve, convert, and save images
         images = list()
@@ -241,30 +272,37 @@ def acquire_images(cam, nodemap):
 
                 #  Ensure image completion
                 if image_result.IsIncomplete():
-                    print('Image incomplete with image status %d...' % image_result.GetImageStatus())
+                    print(
+                        "Image incomplete with image status %d..."
+                        % image_result.GetImageStatus()
+                    )
 
                 else:
                     #  Print image information; height and width recorded in pixels
                     width = image_result.GetWidth()
                     height = image_result.GetHeight()
-                    print('Grabbed Image %d, width = %d, height = %d' % (i, width, height))
+                    print(
+                        "Grabbed Image %d, width = %d, height = %d" % (i, width, height)
+                    )
 
                     #  Convert image to mono 8 and append to list
-                    images.append(image_result.Convert(PySpin.PixelFormat_Mono8, PySpin.HQ_LINEAR))
+                    images.append(
+                        image_result.Convert(PySpin.PixelFormat_Mono8, PySpin.HQ_LINEAR)
+                    )
 
                     #  Release image
                     image_result.Release()
-                    print('')
+                    print("")
 
             except PySpin.SpinnakerException as ex:
-                print('Error: %s' % ex)
+                print("Error: %s" % ex)
                 result = False
 
         # End acquisition
         cam.EndAcquisition()
 
     except PySpin.SpinnakerException as ex:
-        print('Error: %s' % ex)
+        print("Error: %s" % ex)
         result = False
 
     return result, images
@@ -306,7 +344,7 @@ def run_single_camera(cam):
         cam.DeInit()
 
     except PySpin.SpinnakerException as ex:
-        print('Error: %s' % ex)
+        print("Error: %s" % ex)
         result = False
 
     return result
@@ -327,14 +365,17 @@ def main():
 
     # Get current library version
     version = system.GetLibraryVersion()
-    print('Library version: %d.%d.%d.%d' % (version.major, version.minor, version.type, version.build))
+    print(
+        "Library version: %d.%d.%d.%d"
+        % (version.major, version.minor, version.type, version.build)
+    )
 
     # Retrieve list of cameras from the system
     cam_list = system.GetCameras()
 
     num_cameras = cam_list.GetSize()
 
-    print('Number of cameras detected:', num_cameras)
+    print("Number of cameras detected:", num_cameras)
 
     # Finish if there are no cameras
     if num_cameras == 0:
@@ -344,17 +385,17 @@ def main():
         # Release system instance
         system.ReleaseInstance()
 
-        print('Not enough cameras!')
-        input('Done! Press Enter to exit...')
+        print("Not enough cameras!")
+        input("Done! Press Enter to exit...")
         return False
 
     # Run example on each camera
     for i, cam in enumerate(cam_list):
 
-        print('Running example for camera %d...' % i)
+        print("Running example for camera %d..." % i)
 
         result &= run_single_camera(cam)
-        print('Camera %d example complete... \n' % i)
+        print("Camera %d example complete... \n" % i)
 
     # Release reference to camera
     # NOTE: Unlike the C++ examples, we cannot rely on pointer objects being automatically
@@ -368,10 +409,11 @@ def main():
     # Release instance
     system.ReleaseInstance()
 
-    input('Done! Press Enter to exit...')
+    input("Done! Press Enter to exit...")
     return result
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     if main():
         sys.exit(0)
     else:

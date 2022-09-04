@@ -12,7 +12,10 @@ import sys
 system = PySpin.System.GetInstance()
 
 version = system.GetLibraryVersion()
-print('Library version: %d.%d.%d.%d' % (version.major, version.minor, version.type, version.build))
+print(
+    "Library version: %d.%d.%d.%d"
+    % (version.major, version.minor, version.type, version.build)
+)
 
 cam_list = system.GetCameras()
 
@@ -20,8 +23,4 @@ print(cam_list[0])
 num_cameras = cam_list.GetSize()
 
 
-
-
-
-
-#system.ReleaseInstance()
+# system.ReleaseInstance()

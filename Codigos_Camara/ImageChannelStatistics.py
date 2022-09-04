@@ -46,20 +46,31 @@ def acquire_and_display_images(cam, nodemap, nodemap_tldevice):
     :rtype: bool
     """
 
-    print('*** IMAGE ACQUISITION ***\n')
+    print("*** IMAGE ACQUISITION ***\n")
     try:
         result = True
 
-        node_acquisition_mode = PySpin.CEnumerationPtr(nodemap.GetNode('AcquisitionMode'))
-        if not PySpin.IsAvailable(node_acquisition_mode) or not PySpin.IsWritable(node_acquisition_mode):
-            print('Unable to set acquisition mode to continuous (enum retrieval). Aborting...')
+        node_acquisition_mode = PySpin.CEnumerationPtr(
+            nodemap.GetNode("AcquisitionMode")
+        )
+        if not PySpin.IsAvailable(node_acquisition_mode) or not PySpin.IsWritable(
+            node_acquisition_mode
+        ):
+            print(
+                "Unable to set acquisition mode to continuous (enum retrieval). Aborting..."
+            )
             return False
 
         # Retrieve entry node from enumeration node
-        node_acquisition_mode_continuous = node_acquisition_mode.GetEntryByName('Continuous')
-        if not PySpin.IsAvailable(node_acquisition_mode_continuous) or not PySpin.IsReadable(
-                node_acquisition_mode_continuous):
-            print('Unable to set acquisition mode to continuous (entry retrieval). Aborting...')
+        node_acquisition_mode_continuous = node_acquisition_mode.GetEntryByName(
+            "Continuous"
+        )
+        if not PySpin.IsAvailable(
+            node_acquisition_mode_continuous
+        ) or not PySpin.IsReadable(node_acquisition_mode_continuous):
+            print(
+                "Unable to set acquisition mode to continuous (entry retrieval). Aborting..."
+            )
             return False
 
         # Retrieve integer value from entry node
@@ -68,18 +79,24 @@ def acquire_and_display_images(cam, nodemap, nodemap_tldevice):
         # Set integer value from entry node as new value of enumeration node
         node_acquisition_mode.SetIntValue(acquisition_mode_continuous)
 
-        print('Acquisition mode set to continuous...')
+        print("Acquisition mode set to continuous...")
 
-        node_pixel_format = PySpin.CEnumerationPtr(nodemap.GetNode('PixelFormat'))
-        if not PySpin.IsAvailable(node_pixel_format) or not PySpin.IsWritable(node_pixel_format):
-            print('Unable to set Pixel Format. Aborting...')
+        node_pixel_format = PySpin.CEnumerationPtr(nodemap.GetNode("PixelFormat"))
+        if not PySpin.IsAvailable(node_pixel_format) or not PySpin.IsWritable(
+            node_pixel_format
+        ):
+            print("Unable to set Pixel Format. Aborting...")
             return False
 
         else:
             # Retrieve entry node from enumeration node
-            node_pixel_format_mono8 = PySpin.CEnumEntryPtr(node_pixel_format.GetEntryByName('Mono8'))
-            if not PySpin.IsAvailable(node_pixel_format_mono8) or not PySpin.IsReadable(node_pixel_format_mono8):
-                print('Unable to set Pixel Format to MONO8. Aborting...')
+            node_pixel_format_mono8 = PySpin.CEnumEntryPtr(
+                node_pixel_format.GetEntryByName("Mono8")
+            )
+            if not PySpin.IsAvailable(node_pixel_format_mono8) or not PySpin.IsReadable(
+                node_pixel_format_mono8
+            ):
+                print("Unable to set Pixel Format to MONO8. Aborting...")
                 return False
 
             # Retrieve integer value from entry node
@@ -88,17 +105,21 @@ def acquire_and_display_images(cam, nodemap, nodemap_tldevice):
             # Set integer value from entry node as new value of enumeration node
             node_pixel_format.SetIntValue(pixel_format_mono8)
 
-            print('Pixel Format set to MONO8 ...')
+            print("Pixel Format set to MONO8 ...")
 
         cam.BeginAcquisition()
 
-        print('Acquiring images...')
+        print("Acquiring images...")
 
-        device_serial_number = ''
-        node_device_serial_number = PySpin.CStringPtr(nodemap_tldevice.GetNode('DeviceSerialNumber'))
-        if PySpin.IsAvailable(node_device_serial_number) and PySpin.IsReadable(node_device_serial_number):
+        device_serial_number = ""
+        node_device_serial_number = PySpin.CStringPtr(
+            nodemap_tldevice.GetNode("DeviceSerialNumber")
+        )
+        if PySpin.IsAvailable(node_device_serial_number) and PySpin.IsReadable(
+            node_device_serial_number
+        ):
             device_serial_number = node_device_serial_number.GetValue()
-            print('Device serial number retrieved as %s...' % device_serial_number)
+            print("Device serial number retrieved as %s..." % device_serial_number)
 
         plt.ion()
         for i in range(NUM_IMAGES):
@@ -106,7 +127,10 @@ def acquire_and_display_images(cam, nodemap, nodemap_tldevice):
                 image_result = cam.GetNextImage(1000)
 
                 if image_result.IsIncomplete():
-                    print('Image incomplete with image status %d ...' % image_result.GetImageStatus())
+                    print(
+                        "Image incomplete with image status %d ..."
+                        % image_result.GetImageStatus()
+                    )
                 else:
                     fig = plt.figure(1)
 
@@ -116,33 +140,40 @@ def acquire_and_display_images(cam, nodemap, nodemap_tldevice):
                     image_data = image_result.GetNDArray()
 
                     # Display Statistics
-                    print('SN%s image %d:' % (device_serial_number, i))
-                    print('\tNumber pixel values : %d' % image_stats.num_pixel_values)
-                    print('\tRange:                Min = %d, Max = %d' % (image_stats.range_min,
-                                                                          image_stats.range_max))
-                    print('\tPixel Value:          Min = %d, Max = %d, Mean = %.2f' % (image_stats.pixel_value_min,
-                                                                                       image_stats.pixel_value_max,
-                                                                                       image_stats.pixel_value_mean))
+                    print("SN%s image %d:" % (device_serial_number, i))
+                    print("\tNumber pixel values : %d" % image_stats.num_pixel_values)
+                    print(
+                        "\tRange:                Min = %d, Max = %d"
+                        % (image_stats.range_min, image_stats.range_max)
+                    )
+                    print(
+                        "\tPixel Value:          Min = %d, Max = %d, Mean = %.2f"
+                        % (
+                            image_stats.pixel_value_min,
+                            image_stats.pixel_value_max,
+                            image_stats.pixel_value_mean,
+                        )
+                    )
 
-                    # Using matplotlib, two subplots are created where the top subplot is the histogram and the 
+                    # Using matplotlib, two subplots are created where the top subplot is the histogram and the
                     # bottom subplot is the image.
-                    # 
+                    #
                     # Refer to https://matplotlib.org/2.0.2/api/pyplot_api.html#module-matplotlib.pyplot
-                                                                                       
+
                     # Clear the figure to reuse for next plot
                     plt.clf()
-                    
+
                     # Plot the histogram in the first subplot in a 2 row by 1 column grid
                     plt.subplot(211)
                     plt.cla()
-                    plt.plot(image_stats.histogram, label='Grey')
-                    plt.title('SN%s Histogram (%d)' % (device_serial_number, i))
+                    plt.plot(image_stats.histogram, label="Grey")
+                    plt.title("SN%s Histogram (%d)" % (device_serial_number, i))
                     plt.legend()
 
                     # Plot the image in the second subplot in a 2 row by 1 column grid
                     plt.subplot(212)
                     plt.cla()
-                    plt.imshow(image_data, cmap='gray')
+                    plt.imshow(image_data, cmap="gray")
 
                     # Show the image
                     plt.show()
@@ -150,12 +181,15 @@ def acquire_and_display_images(cam, nodemap, nodemap_tldevice):
 
                     # Create a unique filename
                     if device_serial_number:
-                        filename = 'ImageChannelStatistics-%s-%d.png' % (device_serial_number, i)
+                        filename = "ImageChannelStatistics-%s-%d.png" % (
+                            device_serial_number,
+                            i,
+                        )
                     else:  # if serial number is empty
-                        filename = 'ImageChannelStatistics-%d.png' % i
+                        filename = "ImageChannelStatistics-%d.png" % i
 
                     fig.savefig(filename)
-                    print('\tSave to %s' % filename)
+                    print("\tSave to %s" % filename)
                     print()
 
                 except PySpin.SpinnakerException:
@@ -173,12 +207,12 @@ def acquire_and_display_images(cam, nodemap, nodemap_tldevice):
                 raise
 
         cam.EndAcquisition()
-        print('End Acquisition')
+        print("End Acquisition")
 
         plt.close()
 
     except PySpin.SpinnakerException as ex:
-        print('Error: %s' % ex)
+        print("Error: %s" % ex)
         return False
 
     return result
@@ -199,7 +233,7 @@ def run_single_camera(cam):
 
         nodemap_tldevice = cam.GetTLDeviceNodeMap()
 
-        #Initialize camera
+        # Initialize camera
         cam.Init()
 
         # Retrieve GenICam nodemap
@@ -212,10 +246,11 @@ def run_single_camera(cam):
         cam.DeInit()
 
     except PySpin.SpinnakerException as ex:
-        print('Error: %s' % ex)
+        print("Error: %s" % ex)
         result = False
 
     return result
+
 
 def main():
     """
@@ -232,10 +267,10 @@ def main():
     # we must ensure that we have permission to write to this folder.
     # If we do not have permission, fail right away.
     try:
-        test_file = open('test.txt', 'w+')
+        test_file = open("test.txt", "w+")
     except IOError:
-        print('Unable to write to current directory. Please check permissions.')
-        input('Press Enter to exit...')
+        print("Unable to write to current directory. Please check permissions.")
+        input("Press Enter to exit...")
         return False
 
     test_file.close()
@@ -248,14 +283,17 @@ def main():
 
     # Get current library version
     version = system.GetLibraryVersion()
-    print('Library version: %d.%d.%d.%d' % (version.major, version.minor, version.type, version.build))
+    print(
+        "Library version: %d.%d.%d.%d"
+        % (version.major, version.minor, version.type, version.build)
+    )
 
     # Retrieve list of cameras from the system
     cam_list = system.GetCameras()
 
     num_cameras = cam_list.GetSize()
 
-    print('Number of cameras detected: %d' % num_cameras)
+    print("Number of cameras detected: %d" % num_cameras)
 
     # Finish if there are no cameras
     if num_cameras == 0:
@@ -266,17 +304,17 @@ def main():
         # Release system instance
         system.ReleaseInstance()
 
-        print('Not enough cameras!')
-        input('Done! Press Enter to exit...')
+        print("Not enough cameras!")
+        input("Done! Press Enter to exit...")
         return False
 
     # Run example on each camera
     for i, cam in enumerate(cam_list):
 
-        print('Running example for camera %d...' % i)
+        print("Running example for camera %d..." % i)
 
         result &= run_single_camera(cam)
-        print('Camera %d example complete... \n' % i)
+        print("Camera %d example complete... \n" % i)
 
     # Release reference to camera
     # NOTE: Unlike the C++ examples, we cannot rely on pointer objects being automatically
@@ -290,13 +328,12 @@ def main():
     # Release system instance
     system.ReleaseInstance()
 
-    input('Done! Press Enter to exit...')
+    input("Done! Press Enter to exit...")
     return result
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     if main():
         sys.exit(0)
     else:
         sys.exit(1)
-

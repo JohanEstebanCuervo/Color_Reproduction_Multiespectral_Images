@@ -51,7 +51,7 @@ def configure_custom_image_settings(cam):
     :return: True if successful, False otherwise.
     :rtype: bool
     """
-    print('\n*** CONFIGURING CUSTOM IMAGE SETTINGS ***\n')
+    print("\n*** CONFIGURING CUSTOM IMAGE SETTINGS ***\n")
 
     try:
         result = True
@@ -64,12 +64,15 @@ def configure_custom_image_settings(cam):
         # are added to the API.
         if cam.PixelFormat.GetAccessMode() == PySpin.RW:
             cam.PixelFormat.SetValue(PySpin.PixelFormat_Mono8)
-            print('Pixel format set to %s...' % cam.PixelFormat.GetCurrentEntry().GetSymbolic())
+            print(
+                "Pixel format set to %s..."
+                % cam.PixelFormat.GetCurrentEntry().GetSymbolic()
+            )
 
         else:
-            print('Pixel format not available...')
+            print("Pixel format not available...")
             result = False
-            
+
         # Apply minimum to offset X
         #
         # *** NOTES ***
@@ -78,10 +81,10 @@ def configure_custom_image_settings(cam):
         # minimums to ensure that your desired value is within range.
         if cam.OffsetX.GetAccessMode() == PySpin.RW:
             cam.OffsetX.SetValue(cam.OffsetX.GetMin())
-            print('Offset X set to %d...' % cam.OffsetX.GetValue())
+            print("Offset X set to %d..." % cam.OffsetX.GetValue())
 
         else:
-            print('Offset X not available...')
+            print("Offset X not available...")
             result = False
 
         # Apply minimum to offset Y
@@ -94,10 +97,10 @@ def configure_custom_image_settings(cam):
         # is appropriate. The increment is retrieved with the method GetInc().
         if cam.OffsetY.GetAccessMode() == PySpin.RW:
             cam.OffsetY.SetValue(cam.OffsetY.GetMin())
-            print('Offset Y set to %d...' % cam.OffsetY.GetValue())
+            print("Offset Y set to %d..." % cam.OffsetY.GetValue())
 
         else:
-            print('Offset Y not available...')
+            print("Offset Y not available...")
             result = False
 
         # Set maximum width
@@ -111,12 +114,16 @@ def configure_custom_image_settings(cam):
         # This is often the case for width and height nodes. However, because
         # these nodes are being set to their maximums, there is no real reason
         # to check against the increment.
-        if cam.Width.GetAccessMode() == PySpin.RW and cam.Width.GetInc() != 0 and cam.Width.GetMax != 0:
+        if (
+            cam.Width.GetAccessMode() == PySpin.RW
+            and cam.Width.GetInc() != 0
+            and cam.Width.GetMax != 0
+        ):
             cam.Width.SetValue(cam.Width.GetMax())
-            print('Width set to %i...' % cam.Width.GetValue())
+            print("Width set to %i..." % cam.Width.GetValue())
 
         else:
-            print('Width not available...')
+            print("Width not available...")
             result = False
 
         # Set maximum height
@@ -124,16 +131,20 @@ def configure_custom_image_settings(cam):
         # *** NOTES ***
         # A maximum is retrieved with the method GetMax(). A node's minimum and
         # maximum should always be a multiple of its increment.
-        if cam.Height.GetAccessMode() == PySpin.RW and cam.Height.GetInc() != 0 and cam.Height.GetMax != 0:
+        if (
+            cam.Height.GetAccessMode() == PySpin.RW
+            and cam.Height.GetInc() != 0
+            and cam.Height.GetMax != 0
+        ):
             cam.Height.SetValue(cam.Height.GetMax())
-            print('Height set to %i...' % cam.Height.GetValue())
+            print("Height set to %i..." % cam.Height.GetValue())
 
         else:
-            print('Height not available...')
+            print("Height not available...")
             result = False
 
     except PySpin.SpinnakerException as ex:
-        print('Error: %s' % ex)
+        print("Error: %s" % ex)
         return False
 
     return result
@@ -151,26 +162,37 @@ def print_device_info(cam):
     :rtype: bool
     """
 
-    print('\n*** DEVICE INFORMATION ***\n')
+    print("\n*** DEVICE INFORMATION ***\n")
 
     try:
         result = True
         nodemap = cam.GetTLDeviceNodeMap()
 
-        node_device_information = PySpin.CCategoryPtr(nodemap.GetNode('DeviceInformation'))
+        node_device_information = PySpin.CCategoryPtr(
+            nodemap.GetNode("DeviceInformation")
+        )
 
-        if PySpin.IsAvailable(node_device_information) and PySpin.IsReadable(node_device_information):
+        if PySpin.IsAvailable(node_device_information) and PySpin.IsReadable(
+            node_device_information
+        ):
             features = node_device_information.GetFeatures()
             for feature in features:
                 node_feature = PySpin.CValuePtr(feature)
-                print('%s: %s' % (node_feature.GetName(),
-                                  node_feature.ToString() if PySpin.IsReadable(node_feature) else 'Node not readable'))
+                print(
+                    "%s: %s"
+                    % (
+                        node_feature.GetName(),
+                        node_feature.ToString()
+                        if PySpin.IsReadable(node_feature)
+                        else "Node not readable",
+                    )
+                )
 
         else:
-            print('Device control information not available.')
+            print("Device control information not available.")
 
     except PySpin.SpinnakerException as ex:
-        print('Error: %s' % ex.message)
+        print("Error: %s" % ex.message)
         return False
 
     return result
@@ -186,30 +208,33 @@ def acquire_images(cam):
     :return: True if successful, False otherwise.
     :rtype: bool
     """
-    print('\n*** IMAGE ACQUISITION ***\n')
+    print("\n*** IMAGE ACQUISITION ***\n")
 
     try:
         result = True
 
         # Set acquisition mode to continuous
         if cam.AcquisitionMode.GetAccessMode() != PySpin.RW:
-            print('Unable to set acquisition mode to continuous. Aborting...')
+            print("Unable to set acquisition mode to continuous. Aborting...")
             return False
 
         cam.AcquisitionMode.SetValue(PySpin.AcquisitionMode_Continuous)
-        print('Acquisition mode set to continuous...')
+        print("Acquisition mode set to continuous...")
 
         # Begin acquiring images
         cam.BeginAcquisition()
 
-        print('Acquiring images...')
+        print("Acquiring images...")
 
         # Get device serial number for filename
-        device_serial_number = ''
-        if cam.TLDevice.DeviceSerialNumber is not None and cam.TLDevice.DeviceSerialNumber.GetAccessMode() == PySpin.RO:
+        device_serial_number = ""
+        if (
+            cam.TLDevice.DeviceSerialNumber is not None
+            and cam.TLDevice.DeviceSerialNumber.GetAccessMode() == PySpin.RO
+        ):
             device_serial_number = cam.TLDevice.DeviceSerialNumber.GetValue()
 
-            print('Device serial number retrieved as %s...' % device_serial_number)
+            print("Device serial number retrieved as %s..." % device_serial_number)
 
         # Retrieve, convert, and save images
         for i in range(NUM_IMAGES):
@@ -219,40 +244,48 @@ def acquire_images(cam):
                 image_result = cam.GetNextImage(1000)
 
                 if image_result.IsIncomplete():
-                    print('Image incomplete with image status %d...' % image_result.GetImageStatus())
+                    print(
+                        "Image incomplete with image status %d..."
+                        % image_result.GetImageStatus()
+                    )
 
                 else:
                     # Print image information
                     width = image_result.GetWidth()
                     height = image_result.GetHeight()
-                    print('Grabbed Image %d, width = %d, height = %d' % (i, width, height))
+                    print(
+                        "Grabbed Image %d, width = %d, height = %d" % (i, width, height)
+                    )
 
                     # Convert image to Mono8
                     image_converted = image_result.Convert(PySpin.PixelFormat_Mono8)
 
                     # Create a unique filename
                     if device_serial_number:
-                        filename = 'ImageFormatControlQS-%s-%d.jpg' % (device_serial_number, i)
+                        filename = "ImageFormatControlQS-%s-%d.jpg" % (
+                            device_serial_number,
+                            i,
+                        )
                     else:
-                        filename = 'ImageFormatControlQS-%d.jpg' % i
+                        filename = "ImageFormatControlQS-%d.jpg" % i
 
                     # Save image
                     image_converted.Save(filename)
 
-                    print('Image saved at %s' % filename)
+                    print("Image saved at %s" % filename)
 
                 # Release image
                 image_result.Release()
 
             except PySpin.SpinnakerException as ex:
-                print('Error: %s' % ex)
+                print("Error: %s" % ex)
                 result = False
 
         # End acquisition
         cam.EndAcquisition()
 
     except PySpin.SpinnakerException as ex:
-        print('Error: %s' % ex)
+        print("Error: %s" % ex)
         result = False
 
     return result
@@ -260,13 +293,13 @@ def acquire_images(cam):
 
 def run_single_camera(cam):
     """
-     This function acts as the body of the example; please see NodeMapInfo_QuickSpin example for more
-     in-depth comments on setting up cameras.
+    This function acts as the body of the example; please see NodeMapInfo_QuickSpin example for more
+    in-depth comments on setting up cameras.
 
-     :param cam: Camera to run example on.
-     :type cam: CameraPtr
-     :return: True if successful, False otherwise.
-     :rtype: bool
+    :param cam: Camera to run example on.
+    :type cam: CameraPtr
+    :return: True if successful, False otherwise.
+    :rtype: bool
     """
     try:
         # Initialize camera
@@ -288,7 +321,7 @@ def run_single_camera(cam):
         return result
 
     except PySpin.SpinnakerException as ex:
-        print('Error: %s' % ex)
+        print("Error: %s" % ex)
         return False
 
 
@@ -307,14 +340,17 @@ def main():
 
     # Get current library version
     version = system.GetLibraryVersion()
-    print('Library version: %d.%d.%d.%d' % (version.major, version.minor, version.type, version.build))
+    print(
+        "Library version: %d.%d.%d.%d"
+        % (version.major, version.minor, version.type, version.build)
+    )
 
     # Retrieve list of cameras from the system
     cam_list = system.GetCameras()
 
     num_cameras = cam_list.GetSize()
 
-    print('Number of cameras detected: %d' % num_cameras)
+    print("Number of cameras detected: %d" % num_cameras)
 
     # Finish if there are no cameras
     if num_cameras == 0:
@@ -324,17 +360,17 @@ def main():
         # Release system instance
         system.ReleaseInstance()
 
-        print('Not enough cameras!')
-        input('Done! Press Enter to exit...')
+        print("Not enough cameras!")
+        input("Done! Press Enter to exit...")
         return False
 
     # Release example on each camera
     for i, cam in enumerate(cam_list):
 
-        print('Running example for camera %d...' % i)
+        print("Running example for camera %d..." % i)
 
         result &= run_single_camera(cam)
-        print('Camera %d example complete... \n' % i)
+        print("Camera %d example complete... \n" % i)
 
     # Release reference to camera
     # NOTE: Unlike the C++ examples, we cannot rely on pointer objects being automatically
@@ -348,10 +384,11 @@ def main():
     # Release system instance
     system.ReleaseInstance()
 
-    input('Done! Press Enter to exit...')
+    input("Done! Press Enter to exit...")
     return result
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     if main():
         sys.exit(0)
     else:

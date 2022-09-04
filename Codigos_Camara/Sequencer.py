@@ -42,7 +42,7 @@ NUM_IMAGES = 10  # number of images to grab
 
 
 def print_retrieve_node_failure(node, name):
-    """"
+    """ "
     This function handles the error prints when a node or entry is unavailable or
     not readable on the connected camera.
 
@@ -52,13 +52,13 @@ def print_retrieve_node_failure(node, name):
     :type name: String
     :rtype: None
     """
-    print('Unable to get {} ({} {} retrieval failed.)'.format(node, name, node))
-    print('The {} may not be available on all camera models...'.format(node))
-    print('Please try a Blackfly S camera.')
+    print("Unable to get {} ({} {} retrieval failed.)".format(node, name, node))
+    print("The {} may not be available on all camera models...".format(node))
+    print("Please try a Blackfly S camera.")
 
 
 def configure_sequencer_part_one(nodemap):
-    """"
+    """ "
     This function prepares the sequencer to accept custom configurations by
     ensuring sequencer mode is off (this is a requirement to the enabling of
     sequencer configuration mode), disabling automatic gain and exposure, and
@@ -70,7 +70,7 @@ def configure_sequencer_part_one(nodemap):
     :rtype: bool
     """
 
-    print('*** CONFIGURING SEQUENCER ***\n')
+    print("*** CONFIGURING SEQUENCER ***\n")
     try:
         result = True
 
@@ -92,34 +92,46 @@ def configure_sequencer_part_one(nodemap):
         #  the example skips checking this.
         #
         #  Validate sequencer configuration
-        node_sequencer_configuration_valid = PySpin.CEnumerationPtr(nodemap.GetNode('SequencerConfigurationValid'))
-        if not PySpin.IsAvailable(node_sequencer_configuration_valid) \
-                or not PySpin.IsReadable(node_sequencer_configuration_valid):
-            print_retrieve_node_failure('node', 'SequencerConfigurationValid')
+        node_sequencer_configuration_valid = PySpin.CEnumerationPtr(
+            nodemap.GetNode("SequencerConfigurationValid")
+        )
+        if not PySpin.IsAvailable(
+            node_sequencer_configuration_valid
+        ) or not PySpin.IsReadable(node_sequencer_configuration_valid):
+            print_retrieve_node_failure("node", "SequencerConfigurationValid")
             return False
 
-        sequencer_configuration_valid_yes = node_sequencer_configuration_valid.GetEntryByName('Yes')
-        if not PySpin.IsAvailable(sequencer_configuration_valid_yes) \
-                or not PySpin.IsReadable(sequencer_configuration_valid_yes):
-            print_retrieve_node_failure('entry', 'SequencerConfigurationValid Yes')
+        sequencer_configuration_valid_yes = (
+            node_sequencer_configuration_valid.GetEntryByName("Yes")
+        )
+        if not PySpin.IsAvailable(
+            sequencer_configuration_valid_yes
+        ) or not PySpin.IsReadable(sequencer_configuration_valid_yes):
+            print_retrieve_node_failure("entry", "SequencerConfigurationValid Yes")
             return False
 
         # If valid, disable sequencer mode; otherwise, do nothing
-        node_sequencer_mode = PySpin.CEnumerationPtr(nodemap.GetNode('SequencerMode'))
-        if node_sequencer_configuration_valid.GetCurrentEntry().GetValue() == \
-                sequencer_configuration_valid_yes.GetValue():
-            if not PySpin.IsAvailable(node_sequencer_mode) or not PySpin.IsWritable(node_sequencer_mode):
-                print_retrieve_node_failure('node', 'SequencerMode')
+        node_sequencer_mode = PySpin.CEnumerationPtr(nodemap.GetNode("SequencerMode"))
+        if (
+            node_sequencer_configuration_valid.GetCurrentEntry().GetValue()
+            == sequencer_configuration_valid_yes.GetValue()
+        ):
+            if not PySpin.IsAvailable(node_sequencer_mode) or not PySpin.IsWritable(
+                node_sequencer_mode
+            ):
+                print_retrieve_node_failure("node", "SequencerMode")
                 return False
 
-            sequencer_mode_off = node_sequencer_mode.GetEntryByName('Off')
-            if not PySpin.IsAvailable(sequencer_mode_off) or not PySpin.IsReadable(sequencer_mode_off):
-                print_retrieve_node_failure('entry', 'SequencerMode Off')
+            sequencer_mode_off = node_sequencer_mode.GetEntryByName("Off")
+            if not PySpin.IsAvailable(sequencer_mode_off) or not PySpin.IsReadable(
+                sequencer_mode_off
+            ):
+                print_retrieve_node_failure("entry", "SequencerMode Off")
                 return False
 
             node_sequencer_mode.SetIntValue(sequencer_mode_off.GetValue())
 
-        print('Sequencer mode disabled...')
+        print("Sequencer mode disabled...")
 
         # Turn off automatic exposure
         #
@@ -130,19 +142,23 @@ def configure_sequencer_part_one(nodemap):
         #  *** LATER ***
         #  Automatic exposure is turned back on at the end of the example in
         #  order to restore the camera to its default state.
-        node_exposure_auto = PySpin.CEnumerationPtr(nodemap.GetNode('ExposureAuto'))
-        if not PySpin.IsAvailable(node_exposure_auto) or not PySpin.IsWritable(node_exposure_auto):
-            print_retrieve_node_failure('node', 'ExposureAuto')
+        node_exposure_auto = PySpin.CEnumerationPtr(nodemap.GetNode("ExposureAuto"))
+        if not PySpin.IsAvailable(node_exposure_auto) or not PySpin.IsWritable(
+            node_exposure_auto
+        ):
+            print_retrieve_node_failure("node", "ExposureAuto")
             return False
 
-        exposure_auto_off = node_exposure_auto.GetEntryByName('Off')
-        if not PySpin.IsAvailable(exposure_auto_off) or not PySpin.IsReadable(exposure_auto_off):
-            print_retrieve_node_failure('entry', 'ExposureAuto Off')
+        exposure_auto_off = node_exposure_auto.GetEntryByName("Off")
+        if not PySpin.IsAvailable(exposure_auto_off) or not PySpin.IsReadable(
+            exposure_auto_off
+        ):
+            print_retrieve_node_failure("entry", "ExposureAuto Off")
             return False
 
         node_exposure_auto.SetIntValue(exposure_auto_off.GetValue())
 
-        print('Automatic exposure disabled...')
+        print("Automatic exposure disabled...")
 
         # Turn off automatic gain
         #
@@ -153,19 +169,23 @@ def configure_sequencer_part_one(nodemap):
         #  *** LATER ***
         #  Automatic gain is turned back on at the end of the example in
         #  order to restore the camera to its default state.
-        node_gain_auto = PySpin.CEnumerationPtr(nodemap.GetNode('GainAuto'))
-        if not PySpin.IsAvailable(node_gain_auto) or not PySpin.IsWritable(node_gain_auto):
-            print_retrieve_node_failure('node', 'GainAuto')
+        node_gain_auto = PySpin.CEnumerationPtr(nodemap.GetNode("GainAuto"))
+        if not PySpin.IsAvailable(node_gain_auto) or not PySpin.IsWritable(
+            node_gain_auto
+        ):
+            print_retrieve_node_failure("node", "GainAuto")
             return False
 
-        gain_auto_off = node_gain_auto.GetEntryByName('Off')
-        if not PySpin.IsAvailable(gain_auto_off) or not PySpin.IsReadable(gain_auto_off):
-            print_retrieve_node_failure('entry', 'GainAuto Off')
+        gain_auto_off = node_gain_auto.GetEntryByName("Off")
+        if not PySpin.IsAvailable(gain_auto_off) or not PySpin.IsReadable(
+            gain_auto_off
+        ):
+            print_retrieve_node_failure("entry", "GainAuto Off")
             return False
 
         node_gain_auto.SetIntValue(gain_auto_off.GetValue())
 
-        print('Automatic gain disabled...')
+        print("Automatic gain disabled...")
 
         # Turn configuration mode on
         #
@@ -176,30 +196,45 @@ def configure_sequencer_part_one(nodemap):
         # *** LATER ***
         # Before sequencer mode is turned back on, sequencer configuration
         # mode must be turned back off.
-        node_sequencer_configuration_mode = PySpin.CEnumerationPtr(nodemap.GetNode('SequencerConfigurationMode'))
-        if not PySpin.IsAvailable(node_sequencer_configuration_mode) \
-                or not PySpin.IsWritable(node_sequencer_configuration_mode):
-            print_retrieve_node_failure('node', 'SequencerConfigurationMode')
+        node_sequencer_configuration_mode = PySpin.CEnumerationPtr(
+            nodemap.GetNode("SequencerConfigurationMode")
+        )
+        if not PySpin.IsAvailable(
+            node_sequencer_configuration_mode
+        ) or not PySpin.IsWritable(node_sequencer_configuration_mode):
+            print_retrieve_node_failure("node", "SequencerConfigurationMode")
             return False
 
-        sequencer_configuration_mode_on = node_sequencer_configuration_mode.GetEntryByName('On')
-        if not PySpin.IsAvailable(sequencer_configuration_mode_on)\
-                or not PySpin.IsReadable(sequencer_configuration_mode_on):
-            print_retrieve_node_failure('entry', 'SequencerConfigurationMode On')
+        sequencer_configuration_mode_on = (
+            node_sequencer_configuration_mode.GetEntryByName("On")
+        )
+        if not PySpin.IsAvailable(
+            sequencer_configuration_mode_on
+        ) or not PySpin.IsReadable(sequencer_configuration_mode_on):
+            print_retrieve_node_failure("entry", "SequencerConfigurationMode On")
             return False
 
-        node_sequencer_configuration_mode.SetIntValue(sequencer_configuration_mode_on.GetValue())
+        node_sequencer_configuration_mode.SetIntValue(
+            sequencer_configuration_mode_on.GetValue()
+        )
 
-        print('Sequencer configuration mode enabled...\n')
+        print("Sequencer configuration mode enabled...\n")
 
     except PySpin.SpinnakerException as ex:
-        print('Error: {}'.format(ex))
+        print("Error: {}".format(ex))
         result = False
 
     return result
 
 
-def set_single_state(nodemap, sequence_number, width_to_set, height_to_set, exposure_time_to_set, gain_to_set):
+def set_single_state(
+    nodemap,
+    sequence_number,
+    width_to_set,
+    height_to_set,
+    exposure_time_to_set,
+    gain_to_set,
+):
     """
     This function sets a single state. It sets the sequence number, applies
     custom settings, selects the trigger type and next state number, and saves
@@ -233,14 +268,18 @@ def set_single_state(nodemap, sequence_number, width_to_set, height_to_set, expo
         # *** LATER ***
         # The next state - i.e. the state to be linked to -
         # also needs to be set before saving the current state.
-        node_sequencer_set_selector = PySpin.CIntegerPtr(nodemap.GetNode('SequencerSetSelector'))
-        if not PySpin.IsAvailable(node_sequencer_set_selector) or not PySpin.IsWritable(node_sequencer_set_selector):
-            print_retrieve_node_failure('node', 'SequencerSetSelector')
+        node_sequencer_set_selector = PySpin.CIntegerPtr(
+            nodemap.GetNode("SequencerSetSelector")
+        )
+        if not PySpin.IsAvailable(node_sequencer_set_selector) or not PySpin.IsWritable(
+            node_sequencer_set_selector
+        ):
+            print_retrieve_node_failure("node", "SequencerSetSelector")
             return False
 
         node_sequencer_set_selector.SetValue(sequence_number)
 
-        print('Setting state {}...'.format(sequence_number))
+        print("Setting state {}...".format(sequence_number))
 
         # Set desired settings for the current state
         #
@@ -254,7 +293,7 @@ def set_single_state(nodemap, sequence_number, width_to_set, height_to_set, expo
         # for all camera models.
         #
         # Set width; width recorded in pixels
-        node_width = PySpin.CIntegerPtr(nodemap.GetNode('Width'))
+        node_width = PySpin.CIntegerPtr(nodemap.GetNode("Width"))
         if PySpin.IsAvailable(node_width) and PySpin.IsWritable(node_width):
             width_inc = node_width.GetInc()
 
@@ -263,13 +302,15 @@ def set_single_state(nodemap, sequence_number, width_to_set, height_to_set, expo
 
             node_width.SetValue(width_to_set)
 
-            print('\tWidth set to {}...'.format(node_width.GetValue()))
+            print("\tWidth set to {}...".format(node_width.GetValue()))
 
         else:
-            print('\tUnable to set width; width for sequencer not available on all camera models...')
+            print(
+                "\tUnable to set width; width for sequencer not available on all camera models..."
+            )
 
         # Set height; height recorded in pixels
-        node_height = PySpin.CIntegerPtr(nodemap.GetNode('Height'))
+        node_height = PySpin.CIntegerPtr(nodemap.GetNode("Height"))
         if PySpin.IsAvailable(node_height) and PySpin.IsWritable(node_height):
             height_inc = node_height.GetInc()
 
@@ -278,15 +319,19 @@ def set_single_state(nodemap, sequence_number, width_to_set, height_to_set, expo
 
             node_height.SetValue(height_to_set)
 
-            print('\tHeight set to %d...' % node_height.GetValue())
+            print("\tHeight set to %d..." % node_height.GetValue())
 
         else:
-            print('\tUnable to set height; height for sequencer not available on all camera models...')
+            print(
+                "\tUnable to set height; height for sequencer not available on all camera models..."
+            )
 
         # Set exposure time; exposure time recorded in microseconds
-        node_exposure_time = PySpin.CFloatPtr(nodemap.GetNode('ExposureTime'))
-        if not PySpin.IsAvailable(node_exposure_time) or not PySpin.IsWritable(node_exposure_time):
-            print_retrieve_node_failure('node', 'ExposureTime')
+        node_exposure_time = PySpin.CFloatPtr(nodemap.GetNode("ExposureTime"))
+        if not PySpin.IsAvailable(node_exposure_time) or not PySpin.IsWritable(
+            node_exposure_time
+        ):
+            print_retrieve_node_failure("node", "ExposureTime")
             return False
 
         exposure_time_max = node_exposure_time.GetMax()
@@ -296,12 +341,12 @@ def set_single_state(nodemap, sequence_number, width_to_set, height_to_set, expo
 
         node_exposure_time.SetValue(exposure_time_to_set)
 
-        print('\tExposure set to {0:.0f}...'.format(node_exposure_time.GetValue()))
+        print("\tExposure set to {0:.0f}...".format(node_exposure_time.GetValue()))
 
         # Set gain; gain recorded in decibels
-        node_gain = PySpin.CFloatPtr(nodemap.GetNode('Gain'))
+        node_gain = PySpin.CFloatPtr(nodemap.GetNode("Gain"))
         if not PySpin.IsAvailable(node_gain) or not PySpin.IsWritable(node_gain):
-            print_retrieve_node_failure('node', 'Gain')
+            print_retrieve_node_failure("node", "Gain")
             return False
 
         gain_max = node_gain.GetMax()
@@ -311,7 +356,7 @@ def set_single_state(nodemap, sequence_number, width_to_set, height_to_set, expo
 
         node_gain.SetValue(gain_to_set)
 
-        print('\tGain set to {0:.5f}...'.format(node_gain.GetValue()))
+        print("\tGain set to {0:.5f}...".format(node_gain.GetValue()))
 
         # Set the trigger type for the current state
         #
@@ -319,20 +364,29 @@ def set_single_state(nodemap, sequence_number, width_to_set, height_to_set, expo
         # It is a requirement of every state to have its trigger source set.
         # The trigger source refers to the moment when the sequencer changes
         # from one state to the next.
-        node_sequencer_trigger_source = PySpin.CEnumerationPtr(nodemap.GetNode('SequencerTriggerSource'))
-        if not PySpin.IsAvailable(node_sequencer_trigger_source) or not PySpin.IsWritable(node_sequencer_trigger_source):
-            print_retrieve_node_failure('node', 'SequencerTriggerSource')
+        node_sequencer_trigger_source = PySpin.CEnumerationPtr(
+            nodemap.GetNode("SequencerTriggerSource")
+        )
+        if not PySpin.IsAvailable(
+            node_sequencer_trigger_source
+        ) or not PySpin.IsWritable(node_sequencer_trigger_source):
+            print_retrieve_node_failure("node", "SequencerTriggerSource")
             return False
 
-        sequencer_trigger_source_frame_start = node_sequencer_trigger_source.GetEntryByName('FrameStart')
-        if not PySpin.IsAvailable(sequencer_trigger_source_frame_start) or \
-                not PySpin.IsReadable(sequencer_trigger_source_frame_start):
-            print_retrieve_node_failure('entry', 'SequencerTriggerSource FrameStart')
+        sequencer_trigger_source_frame_start = (
+            node_sequencer_trigger_source.GetEntryByName("FrameStart")
+        )
+        if not PySpin.IsAvailable(
+            sequencer_trigger_source_frame_start
+        ) or not PySpin.IsReadable(sequencer_trigger_source_frame_start):
+            print_retrieve_node_failure("entry", "SequencerTriggerSource FrameStart")
             return False
 
-        node_sequencer_trigger_source.SetIntValue(sequencer_trigger_source_frame_start.GetValue())
+        node_sequencer_trigger_source.SetIntValue(
+            sequencer_trigger_source_frame_start.GetValue()
+        )
 
-        print('\tTrigger source set to start of frame...')
+        print("\tTrigger source set to start of frame...")
 
         # Set the next state in the sequence
         #
@@ -341,9 +395,13 @@ def set_single_state(nodemap, sequence_number, width_to_set, height_to_set, expo
         # exceed the maximum and that the states loop appropriately.
         final_sequence_index = 4
 
-        node_sequencer_set_next = PySpin.CIntegerPtr(nodemap.GetNode('SequencerSetNext'))
-        if not PySpin.IsAvailable(node_sequencer_set_next) or not PySpin.IsWritable(node_sequencer_set_next):
-            print('Unable to select next state. Aborting...\n')
+        node_sequencer_set_next = PySpin.CIntegerPtr(
+            nodemap.GetNode("SequencerSetNext")
+        )
+        if not PySpin.IsAvailable(node_sequencer_set_next) or not PySpin.IsWritable(
+            node_sequencer_set_next
+        ):
+            print("Unable to select next state. Aborting...\n")
             return False
 
         if sequence_number == final_sequence_index:
@@ -351,7 +409,7 @@ def set_single_state(nodemap, sequence_number, width_to_set, height_to_set, expo
         else:
             node_sequencer_set_next.SetValue(sequence_number + 1)
 
-        print('\tNext state set to {}...'.format(node_sequencer_set_next.GetValue()))
+        print("\tNext state set to {}...".format(node_sequencer_set_next.GetValue()))
 
         # Save current state
         #
@@ -359,24 +417,28 @@ def set_single_state(nodemap, sequence_number, width_to_set, height_to_set, expo
         # Once all appropriate settings have been configured, make sure to
         # save the state to the sequence. Notice that these settings will be
         # lost when the camera is power-cycled.
-        node_sequencer_set_save = PySpin.CCommandPtr(nodemap.GetNode('SequencerSetSave'))
-        if not PySpin.IsAvailable(node_sequencer_set_save) or not PySpin.IsWritable(node_sequencer_set_save):
-            print('Unable to save state. Aborting...\n')
+        node_sequencer_set_save = PySpin.CCommandPtr(
+            nodemap.GetNode("SequencerSetSave")
+        )
+        if not PySpin.IsAvailable(node_sequencer_set_save) or not PySpin.IsWritable(
+            node_sequencer_set_save
+        ):
+            print("Unable to save state. Aborting...\n")
             return False
 
         node_sequencer_set_save.Execute()
 
-        print('Current state saved...\n')
+        print("Current state saved...\n")
 
     except PySpin.SpinnakerException as ex:
-        print('Error: {}'.format(ex))
+        print("Error: {}".format(ex))
         result = False
 
     return result
 
 
 def configure_sequencer_part_two(nodemap):
-    """"
+    """ "
     Now that the states have all been set, this function readies the camera
     to use the sequencer during image acquisition.
 
@@ -394,21 +456,29 @@ def configure_sequencer_part_two(nodemap):
         # *** NOTES ***
         # Once all desired states have been set, turn sequencer
         # configuration mode off in order to turn sequencer mode on.
-        node_sequencer_configuration_mode = PySpin.CEnumerationPtr(nodemap.GetNode('SequencerConfigurationMode'))
-        if not PySpin.IsAvailable(node_sequencer_configuration_mode) \
-                or not PySpin.IsWritable(node_sequencer_configuration_mode):
-            print_retrieve_node_failure('node', 'SequencerConfigurationMode')
+        node_sequencer_configuration_mode = PySpin.CEnumerationPtr(
+            nodemap.GetNode("SequencerConfigurationMode")
+        )
+        if not PySpin.IsAvailable(
+            node_sequencer_configuration_mode
+        ) or not PySpin.IsWritable(node_sequencer_configuration_mode):
+            print_retrieve_node_failure("node", "SequencerConfigurationMode")
             return False
 
-        sequencer_configuration_mode_off = node_sequencer_configuration_mode.GetEntryByName('Off')
-        if not PySpin.IsAvailable(sequencer_configuration_mode_off)\
-                or not PySpin.IsReadable(sequencer_configuration_mode_off):
-            print_retrieve_node_failure('entry', 'SequencerConfigurationMode Off')
+        sequencer_configuration_mode_off = (
+            node_sequencer_configuration_mode.GetEntryByName("Off")
+        )
+        if not PySpin.IsAvailable(
+            sequencer_configuration_mode_off
+        ) or not PySpin.IsReadable(sequencer_configuration_mode_off):
+            print_retrieve_node_failure("entry", "SequencerConfigurationMode Off")
             return False
 
-        node_sequencer_configuration_mode.SetIntValue(sequencer_configuration_mode_off.GetValue())
+        node_sequencer_configuration_mode.SetIntValue(
+            sequencer_configuration_mode_off.GetValue()
+        )
 
-        print('Sequencer configuration mode disabled...')
+        print("Sequencer configuration mode disabled...")
 
         # Turn sequencer mode on
         #
@@ -419,19 +489,23 @@ def configure_sequencer_part_two(nodemap):
         # *** LATER ***
         # Once all images have been captured, disable the sequencer in order
         # to restore the camera to its initial state.
-        node_sequencer_mode = PySpin.CEnumerationPtr(nodemap.GetNode('SequencerMode'))
-        if not PySpin.IsAvailable(node_sequencer_mode) or not PySpin.IsWritable(node_sequencer_mode):
-            print_retrieve_node_failure('node', 'SequencerMode')
+        node_sequencer_mode = PySpin.CEnumerationPtr(nodemap.GetNode("SequencerMode"))
+        if not PySpin.IsAvailable(node_sequencer_mode) or not PySpin.IsWritable(
+            node_sequencer_mode
+        ):
+            print_retrieve_node_failure("node", "SequencerMode")
             return False
 
-        sequencer_mode_on = node_sequencer_mode.GetEntryByName('On')
-        if not PySpin.IsAvailable(sequencer_mode_on) or not PySpin.IsReadable(sequencer_mode_on):
-            print_retrieve_node_failure('entry', 'SequencerMode On')
+        sequencer_mode_on = node_sequencer_mode.GetEntryByName("On")
+        if not PySpin.IsAvailable(sequencer_mode_on) or not PySpin.IsReadable(
+            sequencer_mode_on
+        ):
+            print_retrieve_node_failure("entry", "SequencerMode On")
             return False
 
         node_sequencer_mode.SetIntValue(sequencer_mode_on.GetValue())
 
-        print('Sequencer mode enabled...')
+        print("Sequencer mode enabled...")
 
         # Validate sequencer settings
         #
@@ -440,34 +514,42 @@ def configure_sequencer_part_two(nodemap):
         # validate them. Although this node cannot ensure that the states
         # have been set up correctly, it does ensure that the states have
         # been set up in such a way that the camera can function.
-        node_sequencer_configuration_valid = PySpin.CEnumerationPtr(nodemap.GetNode('SequencerConfigurationValid'))
-        if not PySpin.IsAvailable(node_sequencer_configuration_valid) \
-                or not PySpin.IsReadable(node_sequencer_configuration_valid):
-            print_retrieve_node_failure('node', 'SequencerConfigurationValid')
+        node_sequencer_configuration_valid = PySpin.CEnumerationPtr(
+            nodemap.GetNode("SequencerConfigurationValid")
+        )
+        if not PySpin.IsAvailable(
+            node_sequencer_configuration_valid
+        ) or not PySpin.IsReadable(node_sequencer_configuration_valid):
+            print_retrieve_node_failure("node", "SequencerConfigurationValid")
             return False
 
-        sequencer_configuration_valid_yes = node_sequencer_configuration_valid.GetEntryByName('Yes')
-        if not PySpin.IsAvailable(sequencer_configuration_valid_yes) \
-                or not PySpin.IsReadable(sequencer_configuration_valid_yes):
-            print_retrieve_node_failure('entry', 'SequencerConfigurationValid Yes')
+        sequencer_configuration_valid_yes = (
+            node_sequencer_configuration_valid.GetEntryByName("Yes")
+        )
+        if not PySpin.IsAvailable(
+            sequencer_configuration_valid_yes
+        ) or not PySpin.IsReadable(sequencer_configuration_valid_yes):
+            print_retrieve_node_failure("entry", "SequencerConfigurationValid Yes")
             return False
 
-        if node_sequencer_configuration_valid.GetCurrentEntry().GetValue() != \
-                sequencer_configuration_valid_yes.GetValue():
-            print('Sequencer configuration not valid. Aborting...\n')
+        if (
+            node_sequencer_configuration_valid.GetCurrentEntry().GetValue()
+            != sequencer_configuration_valid_yes.GetValue()
+        ):
+            print("Sequencer configuration not valid. Aborting...\n")
             return False
 
-        print('Sequencer configuration valid...\n')
+        print("Sequencer configuration valid...\n")
 
     except PySpin.SpinnakerException as ex:
-        print('Error: {}'.format(ex))
+        print("Error: {}".format(ex))
         result = False
 
     return result
 
 
 def reset_sequencer(nodemap):
-    """"
+    """ "
     This function restores the camera to its default state by turning sequencer mode
     off and re-enabling automatic exposure and gain.
 
@@ -484,44 +566,54 @@ def reset_sequencer(nodemap):
         #
         # *** NOTES ***
         # The sequencer is turned off in order to return the camera to its default state.
-        node_sequencer_mode = PySpin.CEnumerationPtr(nodemap.GetNode('SequencerMode'))
-        if not PySpin.IsAvailable(node_sequencer_mode) or not PySpin.IsWritable(node_sequencer_mode):
-            print_retrieve_node_failure('node', 'SequencerMode')
+        node_sequencer_mode = PySpin.CEnumerationPtr(nodemap.GetNode("SequencerMode"))
+        if not PySpin.IsAvailable(node_sequencer_mode) or not PySpin.IsWritable(
+            node_sequencer_mode
+        ):
+            print_retrieve_node_failure("node", "SequencerMode")
             return False
 
-        sequencer_mode_off = node_sequencer_mode.GetEntryByName('Off')
-        if not PySpin.IsAvailable(sequencer_mode_off) or not PySpin.IsReadable(sequencer_mode_off):
-            print_retrieve_node_failure('entry', 'SequencerMode Off')
+        sequencer_mode_off = node_sequencer_mode.GetEntryByName("Off")
+        if not PySpin.IsAvailable(sequencer_mode_off) or not PySpin.IsReadable(
+            sequencer_mode_off
+        ):
+            print_retrieve_node_failure("entry", "SequencerMode Off")
             return False
 
         node_sequencer_mode.SetIntValue(sequencer_mode_off.GetValue())
 
-        print('Turning off sequencer mode...')
+        print("Turning off sequencer mode...")
 
         # Turn automatic exposure back on
         #
         # *** NOTES ***
         # Automatic exposure is turned on in order to return the camera to its default state.
-        node_exposure_auto = PySpin.CEnumerationPtr(nodemap.GetNode('ExposureAuto'))
-        if PySpin.IsAvailable(node_exposure_auto) and PySpin.IsWritable(node_exposure_auto):
-            exposure_auto_continuous = node_exposure_auto.GetEntryByName('Continuous')
-            if PySpin.IsAvailable(exposure_auto_continuous) and PySpin.IsReadable(exposure_auto_continuous):
+        node_exposure_auto = PySpin.CEnumerationPtr(nodemap.GetNode("ExposureAuto"))
+        if PySpin.IsAvailable(node_exposure_auto) and PySpin.IsWritable(
+            node_exposure_auto
+        ):
+            exposure_auto_continuous = node_exposure_auto.GetEntryByName("Continuous")
+            if PySpin.IsAvailable(exposure_auto_continuous) and PySpin.IsReadable(
+                exposure_auto_continuous
+            ):
                 node_exposure_auto.SetIntValue(exposure_auto_continuous.GetValue())
-                print('Turning automatic exposure back on...')
+                print("Turning automatic exposure back on...")
 
         # Turn automatic gain back on
         #
         # *** NOTES ***
         # Automatic gain is turned on in order to return the camera to its default state.
-        node_gain_auto = PySpin.CEnumerationPtr(nodemap.GetNode('GainAuto'))
+        node_gain_auto = PySpin.CEnumerationPtr(nodemap.GetNode("GainAuto"))
         if PySpin.IsAvailable(node_gain_auto) and PySpin.IsWritable(node_gain_auto):
-            gain_auto_continuous = node_exposure_auto.GetEntryByName('Continuous')
-            if PySpin.IsAvailable(gain_auto_continuous) and PySpin.IsReadable(gain_auto_continuous):
+            gain_auto_continuous = node_exposure_auto.GetEntryByName("Continuous")
+            if PySpin.IsAvailable(gain_auto_continuous) and PySpin.IsReadable(
+                gain_auto_continuous
+            ):
                 node_gain_auto.SetIntValue(gain_auto_continuous.GetValue())
-                print('Turning automatic gain mode back on...\n')
+                print("Turning automatic gain mode back on...\n")
 
     except PySpin.SpinnakerException as ex:
-        print('Error: {}'.format(ex))
+        print("Error: {}".format(ex))
         result = False
 
     return result
@@ -539,26 +631,34 @@ def print_device_info(nodemap):
     :rtype: bool
     """
 
-    print('*** DEVICE INFORMATION ***\n')
+    print("*** DEVICE INFORMATION ***\n")
 
     try:
         result = True
-        node_device_information = PySpin.CCategoryPtr(nodemap.GetNode('DeviceInformation'))
+        node_device_information = PySpin.CCategoryPtr(
+            nodemap.GetNode("DeviceInformation")
+        )
 
-        if PySpin.IsAvailable(node_device_information) and PySpin.IsReadable(node_device_information):
+        if PySpin.IsAvailable(node_device_information) and PySpin.IsReadable(
+            node_device_information
+        ):
             features = node_device_information.GetFeatures()
             for feature in features:
                 node_feature = PySpin.CValuePtr(feature)
-                feature_string = node_feature.ToString() if PySpin.IsReadable(node_feature) else 'Node not readable'
-                print('{}: {}'.format(node_feature.GetName(), feature_string))
+                feature_string = (
+                    node_feature.ToString()
+                    if PySpin.IsReadable(node_feature)
+                    else "Node not readable"
+                )
+                print("{}: {}".format(node_feature.GetName(), feature_string))
 
         else:
-            print('Device control information not available.')
+            print("Device control information not available.")
 
-        print('')
+        print("")
 
     except PySpin.SpinnakerException as ex:
-        print('Error: {}'.format(ex))
+        print("Error: {}".format(ex))
         return False
 
     return result
@@ -580,21 +680,31 @@ def acquire_images(cam, nodemap, nodemap_tldevice, timeout):
     :rtype: bool
     """
 
-    print('*** IMAGE ACQUISITION ***\n')
+    print("*** IMAGE ACQUISITION ***\n")
     try:
         result = True
 
         # Set acquisition mode to continuous
-        node_acquisition_mode = PySpin.CEnumerationPtr(nodemap.GetNode('AcquisitionMode'))
-        if not PySpin.IsAvailable(node_acquisition_mode) or \
-                not PySpin.IsWritable(node_acquisition_mode):
-            print('Unable to set acquisition mode to continuous (enum retrieval). Aborting...')
+        node_acquisition_mode = PySpin.CEnumerationPtr(
+            nodemap.GetNode("AcquisitionMode")
+        )
+        if not PySpin.IsAvailable(node_acquisition_mode) or not PySpin.IsWritable(
+            node_acquisition_mode
+        ):
+            print(
+                "Unable to set acquisition mode to continuous (enum retrieval). Aborting..."
+            )
             return False
 
-        node_acquisition_mode_continuous = node_acquisition_mode.GetEntryByName('Continuous')
-        if not PySpin.IsAvailable(node_acquisition_mode_continuous) or \
-                not PySpin.IsReadable(node_acquisition_mode_continuous):
-            print('Unable to set acquisition mode to continuous (entry retrieval). Aborting...')
+        node_acquisition_mode_continuous = node_acquisition_mode.GetEntryByName(
+            "Continuous"
+        )
+        if not PySpin.IsAvailable(
+            node_acquisition_mode_continuous
+        ) or not PySpin.IsReadable(node_acquisition_mode_continuous):
+            print(
+                "Unable to set acquisition mode to continuous (entry retrieval). Aborting..."
+            )
             return False
 
         # Retrieve integer value from entry node
@@ -603,21 +713,27 @@ def acquire_images(cam, nodemap, nodemap_tldevice, timeout):
         # Set integer value from entry node as new value of enumeration node
         node_acquisition_mode.SetIntValue(acquisition_mode_continuous)
 
-        print('Acquisition mode set to continuous...')
+        print("Acquisition mode set to continuous...")
 
         #  Begin acquiring images
         cam.BeginAcquisition()
 
-        print('Acquiring images...')
+        print("Acquiring images...")
 
         #  Retrieve device serial number for filename
-        device_serial_number = ''
-        node_device_serial_number = PySpin.CStringPtr(nodemap_tldevice.GetNode('DeviceSerialNumber'))
-        if PySpin.IsAvailable(node_device_serial_number) and PySpin.IsReadable(node_device_serial_number):
+        device_serial_number = ""
+        node_device_serial_number = PySpin.CStringPtr(
+            nodemap_tldevice.GetNode("DeviceSerialNumber")
+        )
+        if PySpin.IsAvailable(node_device_serial_number) and PySpin.IsReadable(
+            node_device_serial_number
+        ):
             device_serial_number = node_device_serial_number.GetValue()
-            print('Device serial number retrieved as {}...'.format(device_serial_number))
+            print(
+                "Device serial number retrieved as {}...".format(device_serial_number)
+            )
 
-        print('')
+        print("")
 
         # Retrieve, convert, and save images
         for i in range(NUM_IMAGES):
@@ -627,41 +743,51 @@ def acquire_images(cam, nodemap, nodemap_tldevice, timeout):
                 image_result = cam.GetNextImage(timeout)
 
                 if image_result.IsIncomplete():
-                    print('Image incomplete with image status {}...'.format(image_result.GetImageStatus()))
+                    print(
+                        "Image incomplete with image status {}...".format(
+                            image_result.GetImageStatus()
+                        )
+                    )
 
                 else:
 
                     #  Print image information
                     width = image_result.GetWidth()
                     height = image_result.GetHeight()
-                    print('Grabbed image {}, width = {}, height = {}'.format(i, width, height))
+                    print(
+                        "Grabbed image {}, width = {}, height = {}".format(
+                            i, width, height
+                        )
+                    )
 
                     #  Convert image to mono 8
-                    image_converted = image_result.Convert(PySpin.PixelFormat_Mono8, PySpin.HQ_LINEAR)
+                    image_converted = image_result.Convert(
+                        PySpin.PixelFormat_Mono8, PySpin.HQ_LINEAR
+                    )
 
                     # Create a unique filename
                     if device_serial_number:
-                        filename = 'Sequencer-{}-{}.jpg'.format(device_serial_number, i)
+                        filename = "Sequencer-{}-{}.jpg".format(device_serial_number, i)
                     else:  # if serial number is empty
-                        filename = 'Sequencer-{}.jpg'.format(i)
+                        filename = "Sequencer-{}.jpg".format(i)
 
                     #  Save image
                     image_converted.Save(filename)
-                    print('Image saved at {}'.format(filename))
+                    print("Image saved at {}".format(filename))
 
                     #  Release image
                     image_result.Release()
-                    print('')
+                    print("")
 
             except PySpin.SpinnakerException as ex:
-                print('Error: {}'.format(ex))
+                print("Error: {}".format(ex))
                 return False
 
         #  End acquisition
         cam.EndAcquisition()
 
     except PySpin.SpinnakerException as ex:
-        print('Error: {}'.format(ex))
+        print("Error: {}".format(ex))
         return False
 
     return result
@@ -710,17 +836,17 @@ def run_single_camera(cam):
         num_sequences = 5
 
         # Retrieve maximum width; width recorded in pixels
-        node_width = PySpin.CIntegerPtr(nodemap.GetNode('Width'))
+        node_width = PySpin.CIntegerPtr(nodemap.GetNode("Width"))
         if not PySpin.IsAvailable(node_width) or not PySpin.IsReadable(node_width):
-            print('Unable to retrieve maximum width. Aborting...\n')
+            print("Unable to retrieve maximum width. Aborting...\n")
             return False
 
         width_max = node_width.GetMax()
 
         # Retrieve maximum height; height recorded in pixels
-        node_height = PySpin.CIntegerPtr(nodemap.GetNode('Height'))
+        node_height = PySpin.CIntegerPtr(nodemap.GetNode("Height"))
         if not PySpin.IsAvailable(node_height) or not PySpin.IsReadable(node_height):
-            print('Unable to retrieve maximum height. Aborting...\n')
+            print("Unable to retrieve maximum height. Aborting...\n")
             return False
 
         height_max = node_height.GetMax()
@@ -728,9 +854,11 @@ def run_single_camera(cam):
         # Retrieve maximum exposure time; exposure time recorded in microseconds
         exposure_time_max_to_set = 2000000
 
-        node_exposure_time = PySpin.CFloatPtr(nodemap.GetNode('ExposureTime'))
-        if not PySpin.IsAvailable(node_exposure_time) or not PySpin.IsReadable(node_exposure_time):
-            print('Unable to retrieve maximum exposure time. Aborting...\n')
+        node_exposure_time = PySpin.CFloatPtr(nodemap.GetNode("ExposureTime"))
+        if not PySpin.IsAvailable(node_exposure_time) or not PySpin.IsReadable(
+            node_exposure_time
+        ):
+            print("Unable to retrieve maximum exposure time. Aborting...\n")
             return False
 
         exposure_time_max = node_exposure_time.GetMax()
@@ -739,9 +867,11 @@ def run_single_camera(cam):
             exposure_time_max = exposure_time_max_to_set
 
         # Retrieve maximum gain; gain recorded in decibels
-        node_gain = PySpin.CFloatPtr(nodemap.GetNode('Gain'))
-        if not PySpin.IsAvailable(node_exposure_time) or not PySpin.IsReadable(node_exposure_time):
-            print('Unable to retrieve maximum gain. Aborting...\n')
+        node_gain = PySpin.CFloatPtr(nodemap.GetNode("Gain"))
+        if not PySpin.IsAvailable(node_exposure_time) or not PySpin.IsReadable(
+            node_exposure_time
+        ):
+            print("Unable to retrieve maximum gain. Aborting...\n")
             return False
 
         gain_max = node_gain.GetMax()
@@ -754,12 +884,14 @@ def run_single_camera(cam):
 
         # Set custom values of each sequence
         for sequence_num in range(num_sequences):
-            result &= set_single_state(nodemap,
-                                       sequence_num,
-                                       int(width_to_set),
-                                       int(height_to_set),
-                                       exposure_time_to_set,
-                                       gain_to_set)
+            result &= set_single_state(
+                nodemap,
+                sequence_num,
+                int(width_to_set),
+                int(height_to_set),
+                exposure_time_to_set,
+                gain_to_set,
+            )
             if not result:
                 return result
 
@@ -788,7 +920,7 @@ def run_single_camera(cam):
         cam.DeInit()
 
     except PySpin.SpinnakerException as ex:
-        print('Error: {}'.format(ex))
+        print("Error: {}".format(ex))
         result = False
 
     return result
@@ -807,10 +939,10 @@ def main():
     # we must ensure that we have permission to write to this folder.
     # If we do not have permission, fail right away.
     try:
-        test_file = open('test.txt', 'w+')
+        test_file = open("test.txt", "w+")
     except IOError:
-        print('Unable to write to current directory. Please check permissions.')
-        input('Press Enter to exit...')
+        print("Unable to write to current directory. Please check permissions.")
+        input("Press Enter to exit...")
         return False
 
     test_file.close()
@@ -823,14 +955,18 @@ def main():
 
     # Get current library version
     version = system.GetLibraryVersion()
-    print('Library version: {}.{}.{}.{}\n'.format(version.major, version.minor, version.type, version.build))
+    print(
+        "Library version: {}.{}.{}.{}\n".format(
+            version.major, version.minor, version.type, version.build
+        )
+    )
 
     # Retrieve list of cameras from the system
     cam_list = system.GetCameras()
 
     num_cameras = cam_list.GetSize()
 
-    print('Number of cameras detected: {}\n'.format(num_cameras))
+    print("Number of cameras detected: {}\n".format(num_cameras))
 
     # Finish if there are no cameras
     if num_cameras == 0:
@@ -841,17 +977,17 @@ def main():
         # Release system instance
         system.ReleaseInstance()
 
-        print('Not enough cameras!')
-        input('Done! Press Enter to exit...')
+        print("Not enough cameras!")
+        input("Done! Press Enter to exit...")
         return False
 
     # Run example on each camera
     for i, cam in enumerate(cam_list):
 
-        print('Running example for camera {}...\n'.format(i))
+        print("Running example for camera {}...\n".format(i))
 
         result &= run_single_camera(cam)
-        print('Camera {} example complete...\n'.format(i))
+        print("Camera {} example complete...\n".format(i))
 
     # Release reference to camera
     del cam
@@ -862,11 +998,11 @@ def main():
     # Release system instance
     system.ReleaseInstance()
 
-    input('Done! Press Enter to exit...')
+    input("Done! Press Enter to exit...")
     return result
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     if main():
         sys.exit(0)
     else:

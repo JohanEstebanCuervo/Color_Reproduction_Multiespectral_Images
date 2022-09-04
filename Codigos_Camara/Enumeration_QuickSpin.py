@@ -55,14 +55,16 @@ def query_interface(interface):
         # from an interface. Because interface information is made available
         # on the transport layer, camera initialization is not required.
         node_interface_display_name = interface.TLInterface.InterfaceDisplayName
-        if PySpin.IsAvailable(node_interface_display_name) and PySpin.IsReadable(node_interface_display_name):
+        if PySpin.IsAvailable(node_interface_display_name) and PySpin.IsReadable(
+            node_interface_display_name
+        ):
 
             interface_display_name = node_interface_display_name.GetValue()
 
             print(interface_display_name)
 
         else:
-            print('Interface display name not readable')
+            print("Interface display name not readable")
 
         # Update list of cameras on the interface
         #
@@ -91,7 +93,7 @@ def query_interface(interface):
 
         # Return if no cameras detected
         if num_cams == 0:
-            print('\tNo devices detected.\n')
+            print("\tNo devices detected.\n")
             return True
 
         # Print device vendor and model name for each camera on the interface
@@ -120,7 +122,7 @@ def query_interface(interface):
             if cam.TLDevice.DeviceModelName.GetAccessMode() == PySpin.RO:
                 device_model_name = cam.TLDevice.DeviceModelName.GetValue()
 
-            print('\tDevice %i %s %s \n' % (i, device_vendor_name, device_model_name))
+            print("\tDevice %i %s %s \n" % (i, device_vendor_name, device_model_name))
 
         # Release reference to camera
         # NOTE: Unlike the C++ examples, we cannot rely on pointer objects being automatically
@@ -137,7 +139,7 @@ def query_interface(interface):
         cam_list.Clear()
 
     except PySpin.SpinnakerException as ex:
-        print('Error: %s' % ex)
+        print("Error: %s" % ex)
         result = False
 
     return result
@@ -167,7 +169,10 @@ def main():
 
     # Get current library version
     version = system.GetLibraryVersion()
-    print('Library version: %d.%d.%d.%d' % (version.major, version.minor, version.type, version.build))
+    print(
+        "Library version: %d.%d.%d.%d"
+        % (version.major, version.minor, version.type, version.build)
+    )
 
     # Retrieve list of interfaces from the system
     #
@@ -182,7 +187,7 @@ def main():
     # Get number of interfaces
     num_ifaces = iface_list.GetSize()
 
-    print('Number of interfaces detected: %i' % num_ifaces)
+    print("Number of interfaces detected: %i" % num_ifaces)
 
     # Retrieve list of cameras from the system
     #
@@ -198,7 +203,7 @@ def main():
 
     num_cams = cam_list.GetSize()
 
-    print('Number of cameras detected: %i' % num_cams)
+    print("Number of cameras detected: %i" % num_cams)
 
     # Finish if there are no cameras
     if num_cams == 0 or num_ifaces == 0:
@@ -212,11 +217,11 @@ def main():
         # Release system instance
         system.ReleaseInstance()
 
-        print('Not enough cameras!')
-        input('Done! Press Enter to exit...')
+        print("Not enough cameras!")
+        input("Done! Press Enter to exit...")
         return False
 
-    print('\n*** QUERYING INTERFACES ***\n')
+    print("\n*** QUERYING INTERFACES ***\n")
 
     for iface in iface_list:
 
@@ -250,10 +255,11 @@ def main():
     # exception.
     system.ReleaseInstance()
 
-    input('Done! Press Enter to exit...')
+    input("Done! Press Enter to exit...")
     return result
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     if main():
         sys.exit(0)
     else:

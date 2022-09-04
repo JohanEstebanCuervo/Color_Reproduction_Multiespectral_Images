@@ -26,7 +26,7 @@ import PySpin
 import sys
 
 
-last_action = ''
+last_action = ""
 
 
 def progress_callback(action, address, global_percent, curr_percent):
@@ -48,7 +48,7 @@ def progress_callback(action, address, global_percent, curr_percent):
     global last_action
     if action != last_action:
         # Prints action only if changed from previous one
-        print('Action: %s' % action)
+        print("Action: %s" % action)
         last_action = action
 
     return 1
@@ -64,8 +64,8 @@ def message_callback(message):
     :type message: str
     :rtype: None
     """
-    print('Message: %s' % message)
-    
+    print("Message: %s" % message)
+
     return 1
 
 
@@ -82,7 +82,8 @@ def main():
 
     return PySpin.UpdateFirmwareConsole(sys.argv)  # uses command line args
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     if main():
         sys.exit(0)
     else:

@@ -47,6 +47,7 @@ class ImageEventHandler(PySpin.ImageEventHandler):
     destructor, properties, body of OnImageEvent(), and other functions -
     is particular to the example.
     """
+
     _NUM_IMAGES = 10
 
     def __init__(self, cam):
@@ -62,9 +63,13 @@ class ImageEventHandler(PySpin.ImageEventHandler):
         nodemap = cam.GetTLDeviceNodeMap()
 
         # Retrieve device serial number
-        node_device_serial_number = PySpin.CStringPtr(nodemap.GetNode('DeviceSerialNumber'))
+        node_device_serial_number = PySpin.CStringPtr(
+            nodemap.GetNode("DeviceSerialNumber")
+        )
 
-        if PySpin.IsAvailable(node_device_serial_number) and PySpin.IsReadable(node_device_serial_number):
+        if PySpin.IsAvailable(node_device_serial_number) and PySpin.IsReadable(
+            node_device_serial_number
+        ):
             self._device_serial_number = node_device_serial_number.GetValue()
 
         # Initialize image counter to 0
@@ -89,31 +94,39 @@ class ImageEventHandler(PySpin.ImageEventHandler):
         """
         # Save max of _NUM_IMAGES Images
         if self._image_count < self._NUM_IMAGES:
-            print('Image event occurred...')
+            print("Image event occurred...")
 
             # Check if image is incomplete
             if image.IsIncomplete():
-                print('Image incomplete with image status %i...' % image.GetImageStatus())
+                print(
+                    "Image incomplete with image status %i..." % image.GetImageStatus()
+                )
 
             else:
                 # Print image info
-                print('Grabbed image %i, width = %i, height = %i' % (self._image_count,
-                                                                     image.GetWidth(),
-                                                                     image.GetHeight()))
+                print(
+                    "Grabbed image %i, width = %i, height = %i"
+                    % (self._image_count, image.GetWidth(), image.GetHeight())
+                )
 
                 # Convert to mono8
-                image_converted = image.Convert(PySpin.PixelFormat_Mono8, PySpin.HQ_LINEAR)
+                image_converted = image.Convert(
+                    PySpin.PixelFormat_Mono8, PySpin.HQ_LINEAR
+                )
 
                 # Create unique filename and save image
                 if self._device_serial_number:
-                    filename = 'ImageEvents-%s-%i.jpg' % (self._device_serial_number, self._image_count)
+                    filename = "ImageEvents-%s-%i.jpg" % (
+                        self._device_serial_number,
+                        self._image_count,
+                    )
 
                 else:  # if serial number is empty
-                    filename = 'ImageEvents-%i.jpg' % self._image_count
+                    filename = "ImageEvents-%i.jpg" % self._image_count
 
                 image_converted.Save(filename)
 
-                print('Image saved at %s\n' % filename)
+                print("Image saved at %s\n" % filename)
 
                 # Increment image counter
                 self._image_count += 1
@@ -174,7 +187,7 @@ def configure_image_events(cam):
         cam.RegisterEventHandler(image_event_handler)
 
     except PySpin.SpinnakerException as ex:
-        print('Error: %s' % ex)
+        print("Error: %s" % ex)
         result = False
 
     return result, image_event_handler
@@ -200,12 +213,14 @@ def wait_for_images(image_event_handler):
         #  In order to passively capture images using image event handlers and
         #  automatic polling, the main thread sleeps in increments of SLEEP_DURATION ms
         #  until _MAX_IMAGES images have been acquired and saved.
-        while image_event_handler.get_image_count() < image_event_handler.get_max_images():
-            print('\t//\n\t// Sleeping for %i ms. Grabbing images...' % SLEEP_DURATION)
+        while (
+            image_event_handler.get_image_count() < image_event_handler.get_max_images()
+        ):
+            print("\t//\n\t// Sleeping for %i ms. Grabbing images..." % SLEEP_DURATION)
             sleep(SLEEP_DURATION / 1000.0)
 
     except PySpin.SpinnakerException as ex:
-        print('Error: %s' % ex)
+        print("Error: %s" % ex)
         result = False
 
     return result
@@ -234,10 +249,10 @@ def reset_image_events(cam, image_event_handler):
         #  an instance of the camera (it gets deleted in the constructor already).
         cam.UnregisterEventHandler(image_event_handler)
 
-        print('Image events unregistered...')
+        print("Image events unregistered...")
 
     except PySpin.SpinnakerException as ex:
-        print('Error: %s' % ex)
+        print("Error: %s" % ex)
         result = False
 
     return result
@@ -254,24 +269,35 @@ def print_device_info(nodemap):
     :return: True if successful, False otherwise.
     :rtype: bool
     """
-    print('*** DEVICE INFORMATION ***')
+    print("*** DEVICE INFORMATION ***")
 
     try:
         result = True
-        node_device_information = PySpin.CCategoryPtr(nodemap.GetNode('DeviceInformation'))
+        node_device_information = PySpin.CCategoryPtr(
+            nodemap.GetNode("DeviceInformation")
+        )
 
-        if PySpin.IsAvailable(node_device_information) and PySpin.IsReadable(node_device_information):
+        if PySpin.IsAvailable(node_device_information) and PySpin.IsReadable(
+            node_device_information
+        ):
             features = node_device_information.GetFeatures()
             for feature in features:
                 node_feature = PySpin.CValuePtr(feature)
-                print('%s: %s' % (node_feature.GetName(),
-                                  node_feature.ToString() if PySpin.IsReadable(node_feature) else 'Node not readable'))
+                print(
+                    "%s: %s"
+                    % (
+                        node_feature.GetName(),
+                        node_feature.ToString()
+                        if PySpin.IsReadable(node_feature)
+                        else "Node not readable",
+                    )
+                )
 
         else:
-            print('Device control information not available.')
+            print("Device control information not available.")
 
     except PySpin.SpinnakerException as ex:
-        print('Error: %s' % ex.message)
+        print("Error: %s" % ex.message)
         result = False
 
     return result
@@ -293,30 +319,42 @@ def acquire_images(cam, nodemap, image_event_handler):
     :return: True if successful, False otherwise.
     :rtype: bool
     """
-    print('*** IMAGE ACQUISITION ***\n')
+    print("*** IMAGE ACQUISITION ***\n")
     try:
         result = True
 
         # Set acquisition mode to continuous
-        node_acquisition_mode = PySpin.CEnumerationPtr(nodemap.GetNode('AcquisitionMode'))
-        if not PySpin.IsAvailable(node_acquisition_mode) or not PySpin.IsWritable(node_acquisition_mode):
-            print('Unable to set acquisition mode to continuous (enum retrieval). Aborting...')
+        node_acquisition_mode = PySpin.CEnumerationPtr(
+            nodemap.GetNode("AcquisitionMode")
+        )
+        if not PySpin.IsAvailable(node_acquisition_mode) or not PySpin.IsWritable(
+            node_acquisition_mode
+        ):
+            print(
+                "Unable to set acquisition mode to continuous (enum retrieval). Aborting..."
+            )
             return False
 
-        node_acquisition_mode_continuous = node_acquisition_mode.GetEntryByName('Continuous')
-        if not PySpin.IsAvailable(node_acquisition_mode_continuous) or not PySpin.IsReadable(node_acquisition_mode_continuous):
-            print('Unable to set acquisition mode to continuous (entry retrieval). Aborting...')
+        node_acquisition_mode_continuous = node_acquisition_mode.GetEntryByName(
+            "Continuous"
+        )
+        if not PySpin.IsAvailable(
+            node_acquisition_mode_continuous
+        ) or not PySpin.IsReadable(node_acquisition_mode_continuous):
+            print(
+                "Unable to set acquisition mode to continuous (entry retrieval). Aborting..."
+            )
             return False
 
         acquisition_mode_continuous = node_acquisition_mode_continuous.GetValue()
         node_acquisition_mode.SetIntValue(acquisition_mode_continuous)
 
-        print('Acquisition mode set to continuous...')
+        print("Acquisition mode set to continuous...")
 
         # Begin acquiring images
         cam.BeginAcquisition()
 
-        print('Acquiring images...')
+        print("Acquiring images...")
 
         # Retrieve images using image event handler
         wait_for_images(image_event_handler)
@@ -324,7 +362,7 @@ def acquire_images(cam, nodemap, image_event_handler):
         cam.EndAcquisition()
 
     except PySpin.SpinnakerException as ex:
-        print('Error: %s' % ex)
+        print("Error: %s" % ex)
         result = False
 
     return result
@@ -332,7 +370,7 @@ def acquire_images(cam, nodemap, image_event_handler):
 
 def run_single_camera(cam):
     """
-    This function acts as the body of the example; please see NodeMapInfo example 
+    This function acts as the body of the example; please see NodeMapInfo example
     for more in-depth comments on setting up cameras.
 
     :param cam: Camera to acquire images from.
@@ -369,7 +407,7 @@ def run_single_camera(cam):
         cam.DeInit()
 
     except PySpin.SpinnakerException as ex:
-        print('Error: %s' % ex)
+        print("Error: %s" % ex)
         result = False
 
     return result
@@ -377,7 +415,7 @@ def run_single_camera(cam):
 
 def main():
     """
-    Example entry point; please see Enumeration example for additional 
+    Example entry point; please see Enumeration example for additional
     comments on the steps in this function.
 
     :return: True if successful, False otherwise.
@@ -388,10 +426,10 @@ def main():
     # we must ensure that we have permission to write to this folder.
     # If we do not have permission, fail right away.
     try:
-        test_file = open('test.txt', 'w+')
+        test_file = open("test.txt", "w+")
     except IOError:
-        print('Unable to write to current directory. Please check permissions.')
-        input('Press Enter to exit...')
+        print("Unable to write to current directory. Please check permissions.")
+        input("Press Enter to exit...")
         return False
 
     test_file.close()
@@ -404,14 +442,17 @@ def main():
 
     # Get current library version
     version = system.GetLibraryVersion()
-    print('Library version: %d.%d.%d.%d' % (version.major, version.minor, version.type, version.build))
+    print(
+        "Library version: %d.%d.%d.%d"
+        % (version.major, version.minor, version.type, version.build)
+    )
 
     # Retrieve list of cameras from the system
     cam_list = system.GetCameras()
-    
+
     num_cams = cam_list.GetSize()
 
-    print('Number of cameras detected: %i' % num_cams)
+    print("Number of cameras detected: %i" % num_cams)
 
     # Finish if there are no cameras
     if num_cams == 0:
@@ -421,19 +462,19 @@ def main():
         # Release system instance
         system.ReleaseInstance()
 
-        print('Not enough cameras!')
-        input('Done! Press Enter to exit...')
+        print("Not enough cameras!")
+        input("Done! Press Enter to exit...")
         return False
 
     # Run example on each camera
     for i, cam in enumerate(cam_list):
 
-        print('Running example for camera %d...' % i)
+        print("Running example for camera %d..." % i)
 
         result &= run_single_camera(cam)
-        print('Camera %d example complete... \n' % i)
+        print("Camera %d example complete... \n" % i)
 
-	# Release reference to camera
+    # Release reference to camera
     del cam
 
     # Clear camera list before releasing system
@@ -441,11 +482,12 @@ def main():
 
     # Release system instance
     system.ReleaseInstance()
-    input('Done! Press Enter to exit...')
+    input("Done! Press Enter to exit...")
 
     return result
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     if main():
         sys.exit(0)
     else:

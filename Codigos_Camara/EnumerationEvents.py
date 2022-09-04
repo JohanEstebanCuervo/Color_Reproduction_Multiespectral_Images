@@ -34,19 +34,20 @@ class SystemEventHandler(PySpin.InterfaceEventHandler):
     """
     This class defines the properties and methods for device arrivals and removals
     on the system. Take special note of the signatures of the OnDeviceArrival()
-    and OnDeviceRemoval() methods. 
-    All three event handler types - DeviceArrivalEventHandler, DeviceRemovalEventHandler, 
+    and OnDeviceRemoval() methods.
+    All three event handler types - DeviceArrivalEventHandler, DeviceRemovalEventHandler,
     and InterfaceEventHandler - can be registered to interfaces, the system, or both.
     However, in Spinnaker Python, an enumeration event handler must inherit from
     InterfaceEventHandler if we want to handle both arrival and removal events.
 
     *** NOTES ***
     Registering an interface event handler to the system is basically the same thing
-    as registering that event handler to all interfaces, with the added benefit of 
+    as registering that event handler to all interfaces, with the added benefit of
     not having to manage newly arrived or newly removed interfaces. In order to manually
     manage newly arrived or removed interfaces, one would need to implement interface
     arrival/removal event handlers, which are not yet supported in the Spinnaker Python API.
     """
+
     def __init__(self, system):
         """
         Constructor. This sets the system instance.
@@ -58,12 +59,11 @@ class SystemEventHandler(PySpin.InterfaceEventHandler):
         super(SystemEventHandler, self).__init__()
         self.system = system
 
-
     def OnDeviceArrival(self, serial_number):
         """
         This method defines the arrival event on the system. It prints out
         the device serial number of the camera arriving and the number of
-        cameras currently connected. The argument is the serial number of 
+        cameras currently connected. The argument is the serial number of
         the camera that triggered the arrival event.
 
         :param serial_number: gcstring representing the serial number of the arriving camera.
@@ -72,18 +72,22 @@ class SystemEventHandler(PySpin.InterfaceEventHandler):
         """
         cam_list = self.system.GetCameras()
         count = cam_list.GetSize()
-        print('System event handler:')
-        print('\tDevice %i has arrived on the system.' % serial_number)
-        print('\tThere %s %i %s on the system.' % ('is' if count == 1 else 'are',
-                                                   count,
-                                                   'device' if count == 1 else 'devices'))
-
+        print("System event handler:")
+        print("\tDevice %i has arrived on the system." % serial_number)
+        print(
+            "\tThere %s %i %s on the system."
+            % (
+                "is" if count == 1 else "are",
+                count,
+                "device" if count == 1 else "devices",
+            )
+        )
 
     def OnDeviceRemoval(self, serial_number):
         """
         This method defines the removal event on the system. It prints out the
         device serial number of the camera being removed and the number of cameras
-        currently connected. The argument is the serial number of the camera that 
+        currently connected. The argument is the serial number of the camera that
         triggered the removal event.
 
         :param serial_number: gcstring representing the serial number of the removed camera.
@@ -92,11 +96,16 @@ class SystemEventHandler(PySpin.InterfaceEventHandler):
         """
         cam_list = self.system.GetCameras()
         count = cam_list.GetSize()
-        print('System event handler:')
-        print('\tDevice %i was removed from the system.' % serial_number)
-        print('\tThere %s %i %s on the system.' % ('is' if count == 1 else 'are',
-                                                   count,
-                                                   'device' if count == 1 else 'devices'))
+        print("System event handler:")
+        print("\tDevice %i was removed from the system." % serial_number)
+        print(
+            "\tThere %s %i %s on the system."
+            % (
+                "is" if count == 1 else "are",
+                count,
+                "device" if count == 1 else "devices",
+            )
+        )
 
 
 def check_gev_enabled(system):
@@ -110,21 +119,27 @@ def check_gev_enabled(system):
 
     # Retrieve the System TL NodeMap and EnumerateGEVInterfaces node
     system_node_map = system.GetTLNodeMap()
-    node_gev_enumeration = PySpin.CBooleanPtr(system_node_map.GetNode('EnumerateGEVInterfaces'))
+    node_gev_enumeration = PySpin.CBooleanPtr(
+        system_node_map.GetNode("EnumerateGEVInterfaces")
+    )
 
     # Ensure the node is valid
-    if not PySpin.IsAvailable(node_gev_enumeration) or not PySpin.IsReadable(node_gev_enumeration):
-        print('EnumerateGEVInterfaces node is unavailable or unreadable. Aborting...')
+    if not PySpin.IsAvailable(node_gev_enumeration) or not PySpin.IsReadable(
+        node_gev_enumeration
+    ):
+        print("EnumerateGEVInterfaces node is unavailable or unreadable. Aborting...")
         return
 
     # Check if node is enabled
     gev_enabled = node_gev_enumeration.GetValue()
     if not gev_enabled:
-        print('\nWARNING: GEV Enumeration is disabled.')
-        print('If you intend to use GigE cameras please run the EnableGEVInterfaces shortcut\n'
-              'or set EnumerateGEVInterfaces to true and relaunch your application.\n')
+        print("\nWARNING: GEV Enumeration is disabled.")
+        print(
+            "If you intend to use GigE cameras please run the EnableGEVInterfaces shortcut\n"
+            "or set EnumerateGEVInterfaces to true and relaunch your application.\n"
+        )
         return
-    print('GEV enumeration is enabled. Continuing..')
+    print("GEV enumeration is enabled. Continuing..")
 
 
 def main():
@@ -139,32 +154,35 @@ def main():
 
     # Get current library version
     version = system.GetLibraryVersion()
-    print('Library version: %d.%d.%d.%d' % (version.major, version.minor, version.type, version.build))
+    print(
+        "Library version: %d.%d.%d.%d"
+        % (version.major, version.minor, version.type, version.build)
+    )
 
     # Check if GEV enumeration is enabled
     check_gev_enabled(system)
 
     # Retrieve list of cameras from the system
     cam_list = system.GetCameras()
-    
+
     num_cams = cam_list.GetSize()
-    
-    print('Number of cameras detected: %i' % num_cams)
+
+    print("Number of cameras detected: %i" % num_cams)
 
     # Retrieve list of interfaces from the system
     #
     # *** NOTES ***
-    # MacOS interfaces are only registered if they are active. 
-    # For this example to have the desired outcome all devices must be connected 
-    # at the beginning and end of this example in order to register and deregister 
+    # MacOS interfaces are only registered if they are active.
+    # For this example to have the desired outcome all devices must be connected
+    # at the beginning and end of this example in order to register and deregister
     # an event handler on each respective interface.
     iface_list = system.GetInterfaces()
 
     num_ifaces = iface_list.GetSize()
 
-    print('Number of interfaces detected: %i' % num_ifaces)
+    print("Number of interfaces detected: %i" % num_ifaces)
 
-    print('*** CONFIGURING ENUMERATION EVENTS *** \n')
+    print("*** CONFIGURING ENUMERATION EVENTS *** \n")
 
     # Create interface event handler for the system
     #
@@ -188,7 +206,7 @@ def main():
     system.RegisterInterfaceEventHandler(system_event_handler)
 
     # Wait for user to plug in and/or remove camera devices
-    input('\nReady! Remove/Plug in cameras to test or press Enter to exit...\n')
+    input("\nReady! Remove/Plug in cameras to test or press Enter to exit...\n")
 
     # Unregister system event handler from system object
     #
@@ -199,7 +217,7 @@ def main():
 
     # Delete system event handler, which has a system reference
     del system_event_handler
-    print('Event handler unregistered from system...')
+    print("Event handler unregistered from system...")
 
     # Clear camera list before releasing system
     cam_list.Clear()
@@ -210,7 +228,8 @@ def main():
     # Release system instance
     system.ReleaseInstance()
 
-    input('Done! Press Enter to exit...')
+    input("Done! Press Enter to exit...")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

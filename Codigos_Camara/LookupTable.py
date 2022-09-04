@@ -39,7 +39,7 @@ NUM_IMAGES = 10  # number of images to grab
 
 
 def print_retrieve_node_failure(node, name):
-    """"
+    """ "
     This function handles the error prints when a node or entry is unavailable or
     not readable on the connected camera.
 
@@ -81,7 +81,9 @@ def configure_lookup_tables(nodemap):
             return False
 
         lut_selector_lut1 = lut_selector.GetEntryByName("LUT1")
-        if not PySpin.IsAvailable(lut_selector_lut1) or not PySpin.IsReadable(lut_selector_lut1):
+        if not PySpin.IsAvailable(lut_selector_lut1) or not PySpin.IsReadable(
+            lut_selector_lut1
+        ):
             print_retrieve_node_failure("entry", "LUTSelector LUT1")
             return False
 
@@ -204,9 +206,13 @@ def print_device_info(nodemap):
     print("*** DEVICE INFORMATION ***\n")
 
     try:
-        node_device_information = PySpin.CCategoryPtr(nodemap.GetNode("DeviceInformation"))
+        node_device_information = PySpin.CCategoryPtr(
+            nodemap.GetNode("DeviceInformation")
+        )
 
-        if PySpin.IsAvailable(node_device_information) and PySpin.IsReadable(node_device_information):
+        if PySpin.IsAvailable(node_device_information) and PySpin.IsReadable(
+            node_device_information
+        ):
             features = node_device_information.GetFeatures()
             for feature in features:
                 node_feature = PySpin.CValuePtr(feature)
@@ -246,15 +252,26 @@ def acquire_images(cam, nodemap, nodemap_tl_device):
 
     # Set acquisition mode to continuous
     try:
-        node_acquisition_mode = PySpin.CEnumerationPtr(nodemap.GetNode("AcquisitionMode"))
-        if not PySpin.IsAvailable(node_acquisition_mode) or not PySpin.IsWritable(node_acquisition_mode):
-            print("Unable to set acquisition mode to continuous (node retrieval). Aborting...\n")
+        node_acquisition_mode = PySpin.CEnumerationPtr(
+            nodemap.GetNode("AcquisitionMode")
+        )
+        if not PySpin.IsAvailable(node_acquisition_mode) or not PySpin.IsWritable(
+            node_acquisition_mode
+        ):
+            print(
+                "Unable to set acquisition mode to continuous (node retrieval). Aborting...\n"
+            )
             return False
 
-        node_acquisition_mode_continuous = node_acquisition_mode.GetEntryByName("Continuous")
-        if not PySpin.IsAvailable(node_acquisition_mode_continuous) or \
-                not PySpin.IsReadable(node_acquisition_mode_continuous):
-            print("Unable to set acquisition mode to continuous (entry 'continuous' retrieval). Aborting...\n")
+        node_acquisition_mode_continuous = node_acquisition_mode.GetEntryByName(
+            "Continuous"
+        )
+        if not PySpin.IsAvailable(
+            node_acquisition_mode_continuous
+        ) or not PySpin.IsReadable(node_acquisition_mode_continuous):
+            print(
+                "Unable to set acquisition mode to continuous (entry 'continuous' retrieval). Aborting...\n"
+            )
             return False
 
         # Retrieve integer value from entry node
@@ -270,10 +287,16 @@ def acquire_images(cam, nodemap, nodemap_tl_device):
 
         #  Retrieve device serial number for filename
         device_serial_number = ""
-        node_device_serial_number = PySpin.CStringPtr(nodemap_tl_device.GetNode("DeviceSerialNumber"))
-        if PySpin.IsAvailable(node_device_serial_number) and PySpin.IsReadable(node_device_serial_number):
+        node_device_serial_number = PySpin.CStringPtr(
+            nodemap_tl_device.GetNode("DeviceSerialNumber")
+        )
+        if PySpin.IsAvailable(node_device_serial_number) and PySpin.IsReadable(
+            node_device_serial_number
+        ):
             device_serial_number = node_device_serial_number.GetValue()
-            print("Device serial number retrieved as {}...".format(device_serial_number))
+            print(
+                "Device serial number retrieved as {}...".format(device_serial_number)
+            )
 
         print("")
 
@@ -285,20 +308,32 @@ def acquire_images(cam, nodemap, nodemap_tl_device):
                 image_result = cam.GetNextImage(1000)
 
                 if image_result.IsIncomplete():
-                    print("Image incomplete with image status {}...".format(image_result.GetImageStatus()))
+                    print(
+                        "Image incomplete with image status {}...".format(
+                            image_result.GetImageStatus()
+                        )
+                    )
 
                 else:
                     #  Print image information
                     width = image_result.GetWidth()
                     height = image_result.GetHeight()
-                    print("Grabbed image {}, width = {}, height = {}".format(i, width, height))
+                    print(
+                        "Grabbed image {}, width = {}, height = {}".format(
+                            i, width, height
+                        )
+                    )
 
                     #  Convert image to mono 8
-                    image_converted = image_result.Convert(PySpin.PixelFormat_Mono8, PySpin.HQ_LINEAR)
+                    image_converted = image_result.Convert(
+                        PySpin.PixelFormat_Mono8, PySpin.HQ_LINEAR
+                    )
 
                     # Create a unique filename
                     if device_serial_number:
-                        filename = "LookupTable-{}-{}.jpg".format(device_serial_number, i)
+                        filename = "LookupTable-{}-{}.jpg".format(
+                            device_serial_number, i
+                        )
                     else:  # if serial number is empty
                         filename = "LookupTable-{}.jpg".format(i)
 
@@ -394,7 +429,11 @@ def main():
 
     # Get current library version
     version = system.GetLibraryVersion()
-    print("Library version: {}.{}.{}.{}\n".format(version.major, version.minor, version.type, version.build))
+    print(
+        "Library version: {}.{}.{}.{}\n".format(
+            version.major, version.minor, version.type, version.build
+        )
+    )
 
     # Retrieve list of cameras from the system
     cam_list = system.GetCameras()

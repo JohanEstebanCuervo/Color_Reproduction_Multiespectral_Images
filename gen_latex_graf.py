@@ -226,7 +226,7 @@ def generate_median(folder, nombre):
         r"  \caption{"
         r"\label{tab:Average errors of the proposed methods}" +
         r"Average errors deltaE and \% of the proposed methods using "  +
-        f"{nombre_archivo[-2:]} wavelengths{'}'}\n"
+        f"{extract_num(nombre)} wavelengths{'}'}\n"
     )
     file.write("  \\newcolumntype{C}{>{\\centering\\arraybackslash}X}")
     file.write("    \\begin{tabularx}{\\textwidth}{C C C}\n")

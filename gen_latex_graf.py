@@ -48,9 +48,8 @@ def generate_table(folder, nombre):
 
     file.write("\\begin{table}[H]\n")
     file.write(
-        "  \caption{Euclidean distance of each patch for "
-        + nombre_archivo[-2:]
-        + " images }\n"
+        f"  \caption{'{'}\label{'{'}tab:Euclidean distance of each patch for {nombre_archivo[-2:]} images{'}'}"
+        + f"Error deltaE of each patch using {nombre_archivo[-2:]} wavelengths{'}'}\n"
     )
     file.write("  \\begin{center}\n")
     file.write("    \\begin{tabularx}{\\textwidth}{r c c c c c c c c}\n")
@@ -112,6 +111,14 @@ def generate_table(folder, nombre):
     file.write("\end{table}\n")
     file.close()
 
+def extract_num(nombre: str) -> str:
+    nombre = nombre[:-7].split('_')
+    numbers = [int(val)for val in nombre if val.isdigit()]
+    if numbers:
+        return str(numbers[0])
+    else:
+        return '00'
+
 def generate_table_sep(folder, nombre):
     errores_metodos = fun.Read_Variable(folder + "/" + nombre).round(3)
     nombres_metodos = [
@@ -138,9 +145,10 @@ def generate_table_sep(folder, nombre):
 
         file.write("\\begin{table}[H]\n")
         file.write(
-            "  \caption{Euclidean distance of each patch for "
-            + nombre_archivo[-2:]
-            + " images }\n"
+            r"  \caption{Measured Lab error and \% error of each patch using "
+            + metodo
+            + f" correction with {extract_num(nombre)} wavelengths "
+            + r".}\n"
         )
         file.write("  \\begin{center}\n")
         file.write("    \\begin{tabularx}{\\textwidth}{r c c c c c c c c}\n")

@@ -48,8 +48,8 @@ def generate_table(folder, nombre):
 
     file.write("\\begin{table}[H]\n")
     file.write(
-        f"  \caption{'{'}\label{'{'}tab:Euclidean distance of each patch for {nombre_archivo[-2:]} images{'}'}"
-        + f"Error deltaE of each patch using {nombre_archivo[-2:]} wavelengths{'}'}\n"
+        f"  \caption{'{'}\label{'{'}tab:Euclidean distance of each patch for {extract_num(nombre)} images{'}'}"
+        + f"Error deltaE of each patch using {extract_num(nombre)} wavelengths{'}'}\n"
     )
     file.write("  \\begin{center}\n")
     file.write("    \\begin{tabularx}{\\textwidth}{r c c c c c c c c}\n")
@@ -268,7 +268,7 @@ def generate_graphics(folder, nombre):
     plt.ylabel("$\Delta$E", fontsize=20)
     plt.legend(nombres, fontsize=12)
     plt.savefig(
-        "Resultados/Imagenes/grafica_error_Nim" + nombre_archivo[-2:] + ".pdf",
+        "Resultados/Imagenes/grafica_error_Nim_" + extract_num(nombre) + ".pdf",
         format="pdf",
     )
     plt.show()
@@ -280,7 +280,7 @@ def generate_graphics(folder, nombre):
     plt.ylabel("$\Delta$E", fontsize=20)
     plt.legend((nombres[0],nombres[-2],nombres[-1]), fontsize=15)
     plt.savefig(
-        "Resultados/Imagenes/grafica_error2_Nim" + nombre_archivo[-2:] + ".pdf",
+        "Resultados/Imagenes/grafica_error2_Nim_" + extract_num(nombre) + ".pdf",
         format="pdf",
     )
     plt.show()

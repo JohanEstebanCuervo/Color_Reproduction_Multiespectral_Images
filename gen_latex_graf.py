@@ -267,6 +267,7 @@ def generate_graphics(folder, nombre):
     plt.xlabel("patch number", fontsize=20)
     plt.ylabel("$\Delta$E", fontsize=20)
     plt.legend(nombres, fontsize=12)
+    plt.grid()
     plt.savefig(
         "Resultados/Imagenes/grafica_error_Nim_" + extract_num(nombre) + ".pdf",
         format="pdf",
@@ -279,6 +280,7 @@ def generate_graphics(folder, nombre):
     plt.xlabel("patch number", fontsize=20)
     plt.ylabel("$\Delta$E", fontsize=20)
     plt.legend((nombres[0],nombres[-2],nombres[-1]), fontsize=15)
+    plt.grid()
     plt.savefig(
         "Resultados/Imagenes/grafica_error2_Nim_" + extract_num(nombre) + ".pdf",
         format="pdf",
@@ -308,6 +310,7 @@ def generate_graphics_sep(folder, nombre):
         plt.xlabel("patch number", fontsize=24)
         plt.ylabel("$\Delta$E", fontsize=24)
         plt.legend((nombres_metodos[0], metodo), fontsize=20)
+        plt.grid()
         plt.savefig(
             "Resultados/Imagenes/grafica_error_Nim" + nombre_archivo + ".pdf",
             format="pdf",

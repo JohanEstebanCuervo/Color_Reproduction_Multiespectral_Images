@@ -16,22 +16,27 @@ import keras
 
 
 numero_imagenes = 4
-
+'''
 red = keras.models.load_model(
     "Resultados/Variables/Correction_color_neuronal_red_Nim"
     + str(numero_imagenes)
     + ".h5"
+)'''
+
+red = keras.models.load_model(
+    "Resultados/Variables/Correction_color_neuronal_red_Nim4_comb0.H5"
 )
 combinaciones = fun.Read_Variable(
     "Resultados\Variables/" + "combinaciones_mean" + ".pickle"
 )
+'''
 combinaciones[4] = [
     1,
     4,
     6,
     10,
     11,
-]  # se cambia para este codigo al no contar con un led de 410 nm
+]  # se cambia para este codigo al no contar con un led de 410 nm'''
 combinaciones[10] = [
     1,
     2,
@@ -78,8 +83,8 @@ color_check = np.array(
 
 #%% busqueda de los archivos en las carpetas correspondientes
 
-carpeta1 = "foto_api/patron"
-carpeta2 = "informacion/mascaras"
+carpeta1 = "Informacion/patron"
+carpeta2 = "Informacion/mascaras"
 lista1 = os.listdir(carpeta1)
 lista2 = os.listdir(carpeta2)
 
@@ -95,7 +100,7 @@ lista_patron = lista1[15 * (grupo - 1) : 15 * grupo]
 
 imagenes_patron, shape_imag = fun.Read_Multiespectral_imag(carpeta1, lista_patron)
 pesos_ecu = fun.Pesos_ecualizacion(imagenes_patron[:-3], mascaras[18])
-pesos_ecu = np.array(
+'''pesos_ecu = np.array(
     [
         [5.16994],
         [1.34287],
@@ -110,7 +115,7 @@ pesos_ecu = np.array(
         [1.87999],
         [2.09624],
     ]
-).T
+).T'''
 imagenes_patron = (imagenes_patron[:-3].T * pesos_ecu).T / 255
 color_RGB_pixel_ideal = fun.Ideal_Color_Patch_pixel(color_check, mascaras)
 

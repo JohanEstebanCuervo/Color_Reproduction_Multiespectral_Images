@@ -87,7 +87,8 @@ color_RGB_pixel_ideal = fun.Ideal_Color_Patch_pixel(color_check, mascaras)
 
 for i, Comb in enumerate(Combinaciones):
     indices = indice[list(Comb)]
-    plt.figure(figsize=(4, 3))
+    plt.figure(figsize=(12, 8))
+    plt.grid()
     plt.plot(cie[:, 0], cie[:, 1], color="r")
     plt.plot(cie[:, 0], cie[:, 2], color="g")
     plt.plot(cie[:, 0], cie[:, 3], color="b")
@@ -118,14 +119,14 @@ for i, Comb in enumerate(Combinaciones):
     plt.setp(base, "linewidth", 0)
 
     # plt.title('CIE 1931')
-    plt.xlabel("$\lambda$ nm")
-    plt.legend(("X", "Y", "Z"))
+    plt.xlabel("$\lambda$ nm", fontsize=20)
+    plt.legend(("X", "Y", "Z"), fontsize=12)
     plt.savefig(carpeta_guardado + "CIE1931_Nim_" + str(i + 1) + ".pdf", format="pdf")
     plt.show()
 
-    im_RGB = fun.ReproduccionCie1931(imagenes_patron, selec_imagenes=Comb)
+    #im_RGB = fun.ReproduccionCie1931(imagenes_patron, selec_imagenes=Comb)
 
-    fun.imshow("Reproducción CIE 1931", im_RGB)
-    fun.imwrite(
-        "Resultados/Imagenes/reproduccion_CIE_Comb_Nim_" + str(i + 1) + ".png", im_RGB
-    )
+    #fun.imshow("Reproducción CIE 1931", im_RGB)
+    #fun.imwrite(
+    #    "Resultados/Imagenes/reproduccion_CIE_Comb_Nim_" + str(i + 1) + ".png", im_RGB
+    #)
